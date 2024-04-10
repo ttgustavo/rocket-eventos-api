@@ -15,4 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withMiddleware(function (Middleware $middleware) {
+        // Remoce CSRF token protection to API routes
+        $appUrl = (string) env('APP_URL');
+
+        $middleware->validateCsrfTokens([
+            "{$appUrl}/*"
+        ]);
+    })
+    ->create();
