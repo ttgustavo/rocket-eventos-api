@@ -1,3 +1,5 @@
+api.http
+
 /.phpunit.cache
 /node_modules
 /public/build
