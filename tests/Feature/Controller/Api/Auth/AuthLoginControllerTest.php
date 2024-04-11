@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controller;
+namespace Tests\Feature\Controller\Api\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +18,9 @@ class AuthLoginControllerTest extends TestCase
             'password' => 'mypassword'
         ];
         $dataLogin = ['email' => 'email@email.com', 'password' => 'mypassword'];
-        $this->postJson('/register', $dataRegistration);
+        $this->postJson('/api/register', $dataRegistration);
 
-        $response = $this->postJson( '/login', $dataLogin);
+        $response = $this->postJson( '/api/login', $dataLogin);
         
         $response->assertStatus(Response::HTTP_OK);
         $response->assertJsonIsObject();
@@ -34,7 +34,7 @@ class AuthLoginControllerTest extends TestCase
             'password' => 'mypassword'
         ];
 
-        $response = $this->postJson('/login', $data);
+        $response = $this->postJson('/api/login', $data);
 
         $response->assertStatus(Response::HTTP_BAD_REQUEST);
         $response->assertJson(['code' => 1]);
@@ -51,12 +51,12 @@ class AuthLoginControllerTest extends TestCase
         $dataEmailWrongFormat3 = array_merge($data, ['email' => 'myemail@email']);
         $dataEmailWrongFormat4 = array_merge($data, ['email' => 'myemail@email.']);
 
-        $responseEmailMissing1 = $this->postJson('/login', $dataEmailMissing1);
-        $responseEmailMissing2 = $this->postJson('/login', $dataEmailMissing2);
-        $responseWrongFormat1 = $this->postJson('/login', $dataEmailWrongFormat1);
-        $responseWrongFormat2 = $this->postJson('/login', $dataEmailWrongFormat2);
-        $responseWrongFormat3 = $this->postJson('/login', $dataEmailWrongFormat3);
-        $responseWrongFormat4 = $this->postJson('/login', $dataEmailWrongFormat4);
+        $responseEmailMissing1 = $this->postJson('/api/login', $dataEmailMissing1);
+        $responseEmailMissing2 = $this->postJson('/api/login', $dataEmailMissing2);
+        $responseWrongFormat1 = $this->postJson('/api/login', $dataEmailWrongFormat1);
+        $responseWrongFormat2 = $this->postJson('/api/login', $dataEmailWrongFormat2);
+        $responseWrongFormat3 = $this->postJson('/api/login', $dataEmailWrongFormat3);
+        $responseWrongFormat4 = $this->postJson('/api/login', $dataEmailWrongFormat4);
 
         $responseEmailMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
         $responseEmailMissing1->assertJson(['code' => 0]);
@@ -81,10 +81,10 @@ class AuthLoginControllerTest extends TestCase
         $dataPasswordWhitespace = array_merge($data, ['password' => '  ']);
         $dataPasswordMoreThanMaximum = array_merge($data, ['password' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
 
-        $responsePasswordMissing1 = $this->postJson('/login', $dataPasswordMissing1);
-        $responsePasswordMissing2 = $this->postJson('/login', $dataPasswordMissing2);
-        $responsePasswordWhitespace = $this->postJson('/login', $dataPasswordWhitespace);
-        $responsePasswordMoreThanMaximum = $this->postJson('/login', $dataPasswordMoreThanMaximum);
+        $responsePasswordMissing1 = $this->postJson('/api/login', $dataPasswordMissing1);
+        $responsePasswordMissing2 = $this->postJson('/api/login', $dataPasswordMissing2);
+        $responsePasswordWhitespace = $this->postJson('/api/login', $dataPasswordWhitespace);
+        $responsePasswordMoreThanMaximum = $this->postJson('/api/login', $dataPasswordMoreThanMaximum);
 
         $responsePasswordMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
         $responsePasswordMissing1->assertJson(['code' => 0]);

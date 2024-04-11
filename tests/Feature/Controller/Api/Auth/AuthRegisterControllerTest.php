@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controller;
+namespace Tests\Feature\Controller\Api\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ class AuthRegisterControllerTest extends TestCase
             'password' => 'mypassword'
         ];
 
-        $response = $this->postJson( '/register', $data);
+        $response = $this->postJson( '/api/register', $data);
         $response->assertStatus(Response::HTTP_CREATED);
     }
 
@@ -30,10 +30,10 @@ class AuthRegisterControllerTest extends TestCase
             'password' => 'mypassword'
         ];
 
-        $responseCreated = $this->postJson('/register', $data);
+        $responseCreated = $this->postJson('/api/register', $data);
         $responseCreated->assertStatus(Response::HTTP_CREATED);
 
-        $response = $this->postJson('/register', $data);
+        $response = $this->postJson('/api/register', $data);
         $response->assertStatus(Response::HTTP_BAD_REQUEST);
         $response->assertJson([
             'code' => 1,
@@ -53,13 +53,13 @@ class AuthRegisterControllerTest extends TestCase
         $dataNameLessThanMinimum = array_merge($data, ['name' => 'Ab']);
         $dataNameMoreThanMaximum = array_merge($data, ['name' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
 
-        $responseNameMissing1 = $this->postJson('/register', $dataNameMissing1);
-        $responseNameMissing2 = $this->postJson('/register', $dataNameMissing2);
-        $responseNameWhitespace1 = $this->postJson('/register', $dataNameWhitespace1);
-        $responseNameWhitespace2 = $this->postJson('/register', $dataNameWhitespace2);
-        $responseNameWhitespace3 = $this->postJson('/register', $dataNameWhitespace3);
-        $responseNameLessThanMinimum = $this->postJson('/register', $dataNameLessThanMinimum);
-        $responseNameMoreThanMaximum = $this->postJson('/register', $dataNameMoreThanMaximum);
+        $responseNameMissing1 = $this->postJson('/api/register', $dataNameMissing1);
+        $responseNameMissing2 = $this->postJson('/api/register', $dataNameMissing2);
+        $responseNameWhitespace1 = $this->postJson('/api/register', $dataNameWhitespace1);
+        $responseNameWhitespace2 = $this->postJson('/api/register', $dataNameWhitespace2);
+        $responseNameWhitespace3 = $this->postJson('/api/register', $dataNameWhitespace3);
+        $responseNameLessThanMinimum = $this->postJson('/api/register', $dataNameLessThanMinimum);
+        $responseNameMoreThanMaximum = $this->postJson('/api/register', $dataNameMoreThanMaximum);
 
         $responseNameMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
         $responseNameMissing1->assertJson(['code' => 0]);
@@ -88,12 +88,12 @@ class AuthRegisterControllerTest extends TestCase
         $dataEmailWrongFormat3 = array_merge($data, ['email' => 'myemail@email']);
         $dataEmailWrongFormat4 = array_merge($data, ['email' => 'myemail@email.']);
 
-        $responseEmailMissing1 = $this->postJson('/register', $dataEmailMissing1);
-        $responseEmailMissing2 = $this->postJson('/register', $dataEmailMissing2);
-        $responseWrongFormat1 = $this->postJson('/register', $dataEmailWrongFormat1);
-        $responseWrongFormat2 = $this->postJson('/register', $dataEmailWrongFormat2);
-        $responseWrongFormat3 = $this->postJson('/register', $dataEmailWrongFormat3);
-        $responseWrongFormat4 = $this->postJson('/register', $dataEmailWrongFormat4);
+        $responseEmailMissing1 = $this->postJson('/api/register', $dataEmailMissing1);
+        $responseEmailMissing2 = $this->postJson('/api/register', $dataEmailMissing2);
+        $responseWrongFormat1 = $this->postJson('/api/register', $dataEmailWrongFormat1);
+        $responseWrongFormat2 = $this->postJson('/api/register', $dataEmailWrongFormat2);
+        $responseWrongFormat3 = $this->postJson('/api/register', $dataEmailWrongFormat3);
+        $responseWrongFormat4 = $this->postJson('/api/register', $dataEmailWrongFormat4);
 
         $responseEmailMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
         $responseEmailMissing1->assertJson(['code' => 0]);
@@ -119,11 +119,11 @@ class AuthRegisterControllerTest extends TestCase
         $dataPasswordLessThanMinimum = array_merge($data, ['password' => 'aaaaaaa']);
         $dataPasswordMoreThanMaximum = array_merge($data, ['password' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
 
-        $responsePasswordMissing1 = $this->postJson('/register', $dataPasswordMissing1);
-        $responsePasswordMissing2 = $this->postJson('/register', $dataPasswordMissing2);
-        $responsePasswordWhitespace = $this->postJson('/register', $dataPasswordWhitespace);
-        $responsePasswordLessThanMinimum = $this->postJson('/register', $dataPasswordLessThanMinimum);
-        $responsePasswordMoreThanMaximum = $this->postJson('/register', $dataPasswordMoreThanMaximum);
+        $responsePasswordMissing1 = $this->postJson('/api/register', $dataPasswordMissing1);
+        $responsePasswordMissing2 = $this->postJson('/api/register', $dataPasswordMissing2);
+        $responsePasswordWhitespace = $this->postJson('/api/register', $dataPasswordWhitespace);
+        $responsePasswordLessThanMinimum = $this->postJson('/api/register', $dataPasswordLessThanMinimum);
+        $responsePasswordMoreThanMaximum = $this->postJson('/api/register', $dataPasswordMoreThanMaximum);
 
         $responsePasswordMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
         $responsePasswordMissing1->assertJson(['code' => 0]);

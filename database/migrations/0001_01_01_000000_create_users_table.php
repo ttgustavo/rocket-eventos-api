@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Model\UserRole;
 use App\Domain\Model\UserStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->unsignedTinyInteger('status')->default(UserStatus::Registered);
+            $table->unsignedTinyInteger('role')->default(UserRole::USER);
             $table->rememberToken();
             $table->timestamps();
         });

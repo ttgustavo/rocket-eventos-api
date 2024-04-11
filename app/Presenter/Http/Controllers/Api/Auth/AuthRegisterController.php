@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Presenter\Http\Controllers\Auth;
+namespace App\Presenter\Http\Controllers\Api\Auth;
 
 use App\Domain\Error\RegisterError;
 use App\Domain\Usecase\RegisterUsecase;
-use App\Presenter\Http\Controllers\Controller;
+use App\Presenter\Http\Controllers\Api\ApiController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthRegisterController extends Controller
+class AuthRegisterController extends ApiController
 {
     private $usecase;
 

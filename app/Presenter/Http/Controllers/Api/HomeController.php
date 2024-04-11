@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Presenter\Http\Controllers;
+namespace App\Presenter\Http\Controllers\Api;
 
 use Illuminate\Http\Response;
 
-class HomeController extends Controller
+class HomeController extends ApiController
 {
     public function __invoke(): Response
     {
