@@ -3,6 +3,7 @@
 use App\Presenter\Http\Controllers\Api\Auth\AuthLoginController;
 use App\Presenter\Http\Controllers\Api\Auth\AuthRegisterController;
 use App\Presenter\Http\Controllers\Api\Events\CreateEventController;
+use App\Presenter\Http\Controllers\Api\Events\GetEventController;
 use App\Presenter\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +17,4 @@ Route::get('/', HomeController::class);
 // Admin routes
 Route::get('/admin')->middleware('auth:sanctum');
 Route::post('/admin/events', CreateEventController::class);
+Route::get('/admin/events/{eventSlug}', GetEventController::class);

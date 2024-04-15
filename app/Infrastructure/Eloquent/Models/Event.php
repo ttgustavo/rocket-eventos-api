@@ -2,6 +2,8 @@
 
 namespace App\Infrastructure\Eloquent\Models;
 
+use App\Domain\Model\EventModel;
+use App\Domain\Model\EventStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -53,5 +55,21 @@ class Event extends Model
             'subscription_date_end' => 'datetime',
             'presentation_at' => 'datetime',
         ];
+    }
+
+    public function toDomainModel(): EventModel
+    {
+        return new EventModel(
+            $this->id,
+            $this->name,
+            $this->slug,
+            $this->details,
+            $this->subscription_date_start,
+            $this->subscription_date_end,
+            $this->presentation_at,
+            $this->created_at,
+            $this->updated_at,
+            EventStatus::from($this->status)
+        );
     }
 }

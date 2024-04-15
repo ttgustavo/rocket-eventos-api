@@ -46,4 +46,12 @@ class EventRepositoryEloquent implements EventRepository
             EventStatus::from($event->status)
         );
     }
+
+    public function getBySlug(string $slug): ?EventModel
+    {
+        $entity = Event::whereSlug($slug)->first();
+        if (is_null($entity)) return null;
+
+        return $entity->toDomainModel();
+    }
 }

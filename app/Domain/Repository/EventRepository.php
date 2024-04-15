@@ -7,6 +7,7 @@ use App\Domain\Model\EventModel;
 interface EventRepository
 {
     public function hasEventWithSlug(string $slug): bool;
+
     public function create(
         string $name,
         string $slug,
@@ -15,4 +16,6 @@ interface EventRepository
         string $subscriptionDateEnd,
         string $presentationAt,
     ): EventModel;
+
+    public function getBySlug(string $slug): ?EventModel;
 }
