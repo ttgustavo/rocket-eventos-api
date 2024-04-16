@@ -94,4 +94,9 @@ class EventRepositoryEloquent implements EventRepository
 
         return $event->toDomainModel();
     }
+
+    public function delete(int $id): void
+    {
+        Event::whereId($id)->delete();
+    }
 }

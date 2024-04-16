@@ -21,4 +21,6 @@ interface EventRepository
     public function getBySlug(string $slug): ?EventModel;
 
     public function update(int $id, array $data): ?EventModel;
+
+    public function delete(int $id): void;
 }
