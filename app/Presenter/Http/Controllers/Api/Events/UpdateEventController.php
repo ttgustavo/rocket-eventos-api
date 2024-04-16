@@ -19,7 +19,7 @@ class UpdateEventController extends ApiController
         $this->repository = $repository;
     }
 
-    public function __invoke(Request $request, int $eventId): JsonResponse
+    public function __invoke(Request $request, int|string $eventId): JsonResponse
     {
         $jsonString = $request->getContent();
         $json = json_decode($jsonString, true);
@@ -44,7 +44,7 @@ class UpdateEventController extends ApiController
         return parent::responseOk($event);
     }
 
-    private function validateParams(int $id): bool
+    private function validateParams(int|string $id): bool
     {
         $inputs = ['id' => $id];
         $rules = [

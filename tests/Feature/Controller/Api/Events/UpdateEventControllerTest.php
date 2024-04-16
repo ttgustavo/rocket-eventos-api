@@ -95,6 +95,14 @@ class UpdateEventControllerTest extends TestCase
         $response->assertJson(['code' => 0]);
     }
 
+    public function test_returns_status_code_bad_request_with_code_0_data_when_event_id_is_not_a_number(): void
+    {
+        $response = parent::patch("/api/admin/events/abc");
+
+        $response->assertBadRequest();
+        $response->assertJson(['code' => 0]);
+    }
+
     public function test_returns_status_code_bad_request_with_code_0_when_name_is_empty(): void
     {
         $data = ['name' => ''];
