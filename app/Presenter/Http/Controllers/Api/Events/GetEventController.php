@@ -24,9 +24,7 @@ class GetEventController extends ApiController
         $isValid = $this->validateParams($eventSlug);
         if ($isValid === false) return parent::responseBadRequest(['code' => 0]);
 
-        var_dump($eventSlug);
         $event = $this->repository->getBySlug($eventSlug);
-        var_dump($event);
         if ($event === null) return parent::responseBadRequest(['code' => 1]);
 
         return parent::responseOk($event);
