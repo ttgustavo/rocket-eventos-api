@@ -6,6 +6,7 @@ use App\Domain\Model\EventModel;
 
 interface EventRepository
 {
+    public function hasEventWithId(int $id): bool;
     public function hasEventWithSlug(string $slug): bool;
 
     public function create(
@@ -18,4 +19,6 @@ interface EventRepository
     ): EventModel;
 
     public function getBySlug(string $slug): ?EventModel;
+
+    public function update(int $id, array $data): ?EventModel;
 }

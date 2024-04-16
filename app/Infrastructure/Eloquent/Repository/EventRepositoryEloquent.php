@@ -10,6 +10,12 @@ use Carbon\Carbon;
 
 class EventRepositoryEloquent implements EventRepository
 {
+    public function hasEventWithId(int $id): bool
+    {
+        $event = Event::whereId($id)->first(['id']);
+        return $event !== null;
+    }
+
     public function hasEventWithSlug(string $slug): bool
     {
         $event = Event::whereSlug($slug)->first(['id']);
@@ -53,5 +59,39 @@ class EventRepositoryEloquent implements EventRepository
         if (is_null($entity)) return null;
 
         return $entity->toDomainModel();
+    }
+
+    public function update(int $id, array $data): ?EventModel
+    {
+        $event = Event::whereId($id)->first();
+
+        if (key_exists('name', $data)) {
+            $event->name = $data['name'];
+        }
+        if (key_exists('slug', $data)) {
+            $event->slug = $data['slug'];
+        }
+        if (key_exists('details', $data)) {
+            $event->details = $data['details'];
+        }
+        if (key_exists('subscription_date_start', $data)) {
+            $event->subscription_date_start = $data['subscription_date_start'];
+        }
+        if (key_exists('subscription_date_end', $data)) {
+            $event->subscription_date_end = $data['subscription_date_end'];
+        }
+        if (key_exists('presentation_at', $data)) {
+            $event->presentation_at = $data['presentation_at'];
+        }
+        if (key_exists('status', $data)) {
+            $event->status = $data['status'];
+        }
+
+        $event->save();
+
+        $hasChanges = $event->wasChanged();
+        if ($hasChanges === false) return null;
+
+        return $event->toDomainModel();
     }
 }
