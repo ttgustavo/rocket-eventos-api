@@ -2,49 +2,36 @@
 
 namespace App\Presenter\Http\Controllers\Api\Auth;
 
+use App\Infrastructure\Eloquent\Models\User;
 use App\Presenter\Http\Controllers\Api\ApiController;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
 class AuthLoginController extends ApiController
 {
-    const VALIDATOR_RULES = [
-        'email' => 'required|email:rfc,dns',
-        'password'=> 'required|min:1|max:100',
-    ];
-
     public function __invoke(Request $request): JsonResponse
     {
         $jsonString = $request->getContent();
         $json = json_decode($jsonString, true);
 
-        $this->trim($json, ['password']);
+        $this->trim($json, [AuthControllerInputs::FIELD_PASSWORD]);
 
-        $validator = Validator::make($json, self::VALIDATOR_RULES);
-        if ($validator->fails()) return $this->responseFailure(0);
+        $validator = $this->validateInputs($json);
+        if ($validator->fails()) return parent::responseBadRequest(['code' => 0]);
 
-        $data = $validator->validated();
-        $isAuthenticated = Auth::once($data);
+        $data = $validator->valid();
 
-        if ($isAuthenticated === false) return $this->responseFailure(1);
+        $authenticated = Auth::once($data);
+        if ($authenticated === false) return parent::responseBadRequest(['code' => 1]);
 
-        $token = $request->user()->createToken('user')->plainTextToken;
-        return $this->responseSuccess($token);
-    }
+        /** @var Authenticatable|User $user */
+        $user = Auth::user();
+        $token = $user->createToken('user')->plainTextToken;
 
-    private function responseSuccess(string $token): JsonResponse
-    {
-        $payload = ['token' => $token];
-        return response()->json($payload, Response::HTTP_OK);
-    }
-
-    private function responseFailure(int $code): JsonResponse
-    {
-        $payload = ['code' => $code];
-        return response()->json($payload, Response::HTTP_BAD_REQUEST);
+        return parent::responseOk(['token' => $token]);
     }
 
     private function trim(array &$array, array $ignore = []): void
@@ -54,5 +41,15 @@ class AuthLoginController extends ApiController
             if (in_array($key, $ignore)) continue;
             $array[$key] = trim($value);
         }
+    }
+
+    private function validateInputs(array $inputs): \Illuminate\Validation\Validator
+    {
+        $rules = [
+            AuthControllerInputs::FIELD_EMAIL => 'required|email:rfc,dns',
+            AuthControllerInputs::FIELD_PASSWORD => 'required|min:1|max:100'
+        ];
+
+        return Validator::make($inputs, $rules);
     }
 }

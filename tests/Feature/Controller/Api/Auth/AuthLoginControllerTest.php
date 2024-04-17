@@ -2,54 +2,67 @@
 
 namespace Tests\Feature\Controller\Api\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Symfony\Component\HttpFoundation\Response;
+use App\Presenter\Http\Controllers\Api\Auth\AuthControllerInputs;
+use Database\Factories\UserFactory;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\NewAccessToken;
+use Laravel\Sanctum\PersonalAccessToken;
 use Tests\TestCase;
 
 class AuthLoginControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function test_returns_status_code_200_with_token_when_authenticated(): void
+    public function test_when_authenticated_returns_status_code_200_with_token(): void
     {
-        $dataRegistration = [
-            'name' => 'Gustavo',
-            'email' => 'email@email.com',
-            'password' => 'mypassword'
-        ];
-        $dataLogin = ['email' => 'email@email.com', 'password' => 'mypassword'];
-        $this->postJson('/api/register', $dataRegistration);
+        $personalAccessToken = new PersonalAccessToken();
+        $accessToken = new NewAccessToken($personalAccessToken, 'my_token');
+        $user = UserFactory::new()->makeOne();
+        $userMocked = \Mockery::mock($user)
+            ->makePartial()
+            ->shouldReceive('createToken')
+            ->andReturn($accessToken)
+            ->getMock();
+        Auth::shouldReceive('once')->once()->andReturn(true);
+        Auth::shouldReceive('user')->andReturn($userMocked);
 
+        $dataLogin = [
+            AuthControllerInputs::FIELD_EMAIL => 'email@email.com',
+            AuthControllerInputs::FIELD_PASSWORD => 'mypassword'
+        ];
         $response = $this->postJson( '/api/login', $dataLogin);
-        
-        $response->assertStatus(Response::HTTP_OK);
+
+        $response->assertOk();
         $response->assertJsonIsObject();
-        $response->assertJsonStructure(['token']);
+        $response->assertJson(['token' => 'my_token']);
     }
 
-    public function test_returns_status_code_400_when_authentication_fails(): void
+    public function test_when_authentication_fails_returns_status_code_400_with_code_1(): void
     {
-        $data = [
-            'email' => 'email@email.com',
-            'password' => 'mypassword'
-        ];
+        Auth::shouldReceive('once')->andReturn(false);
 
+        $data = [
+            AuthControllerInputs::FIELD_EMAIL => 'email@email.com',
+            AuthControllerInputs::FIELD_PASSWORD => 'mypassword'
+        ];
         $response = $this->postJson('/api/login', $data);
 
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertBadRequest();
         $response->assertJson(['code' => 1]);
     }
 
-    public function test_returns_status_code_400_with_code_1_when_validation_email_fails(): void
+    // ---- Validation
+    public function test_when_validation_email_fails_returns_status_code_400_with_code_0(): void
     {
-        $data = ['name' => 'Gustavo', 'password' => 'password'];
+        $data = [
+            AuthControllerInputs::FIELD_NAME => 'Gustavo',
+            AuthControllerInputs::FIELD_PASSWORD => 'password'
+        ];
 
         $dataEmailMissing1 = array_merge($data, []);
-        $dataEmailMissing2 = array_merge($data, ['email' => '']);
-        $dataEmailWrongFormat1 = array_merge($data, ['email' => 'myemail']);
-        $dataEmailWrongFormat2 = array_merge($data, ['email' => '@email.com']);
-        $dataEmailWrongFormat3 = array_merge($data, ['email' => 'myemail@email']);
-        $dataEmailWrongFormat4 = array_merge($data, ['email' => 'myemail@email.']);
+        $dataEmailMissing2 = array_merge($data, [AuthControllerInputs::FIELD_EMAIL => '']);
+        $dataEmailWrongFormat1 = array_merge($data, [AuthControllerInputs::FIELD_EMAIL => 'myemail']);
+        $dataEmailWrongFormat2 = array_merge($data, [AuthControllerInputs::FIELD_EMAIL => '@email.com']);
+        $dataEmailWrongFormat3 = array_merge($data, [AuthControllerInputs::FIELD_EMAIL => 'myemail@email']);
+        $dataEmailWrongFormat4 = array_merge($data, [AuthControllerInputs::FIELD_EMAIL => 'myemail@email.']);
 
         $responseEmailMissing1 = $this->postJson('/api/login', $dataEmailMissing1);
         $responseEmailMissing2 = $this->postJson('/api/login', $dataEmailMissing2);
@@ -58,41 +71,44 @@ class AuthLoginControllerTest extends TestCase
         $responseWrongFormat3 = $this->postJson('/api/login', $dataEmailWrongFormat3);
         $responseWrongFormat4 = $this->postJson('/api/login', $dataEmailWrongFormat4);
 
-        $responseEmailMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseEmailMissing1->assertBadRequest();
         $responseEmailMissing1->assertJson(['code' => 0]);
-        $responseEmailMissing2->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseEmailMissing2->assertBadRequest();
         $responseEmailMissing2->assertJson(['code' => 0]);
-        $responseWrongFormat1->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseWrongFormat1->assertBadRequest();
         $responseWrongFormat1->assertJson(['code' => 0]);
-        $responseWrongFormat2->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseWrongFormat2->assertBadRequest();
         $responseWrongFormat2->assertJson(['code' => 0]);
-        $responseWrongFormat3->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseWrongFormat3->assertBadRequest();
         $responseWrongFormat3->assertJson(['code' => 0]);
-        $responseWrongFormat4->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responseWrongFormat4->assertBadRequest();
         $responseWrongFormat4->assertJson(['code' => 0]);
     }
 
-    public function test_returns_status_code_400_with_code_1_when_validation_password_fails(): void
+    public function test_when_validation_password_fails_returns_status_code_400_with_code_0(): void
     {
-        $data = ['name' => 'Gustavo', 'email' => 'email@email.com'];
+        $data = [
+            AuthControllerInputs::FIELD_NAME => 'Gustavo',
+            AuthControllerInputs::FIELD_EMAIL => 'email@email.com'
+        ];
 
         $dataPasswordMissing1 = array_merge($data, []);
-        $dataPasswordMissing2 = array_merge($data, ['password' => '']);
-        $dataPasswordWhitespace = array_merge($data, ['password' => '  ']);
-        $dataPasswordMoreThanMaximum = array_merge($data, ['password' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
+        $dataPasswordMissing2 = array_merge($data, [AuthControllerInputs::FIELD_PASSWORD => '']);
+        $dataPasswordWhitespace = array_merge($data, [AuthControllerInputs::FIELD_PASSWORD => '  ']);
+        $dataPasswordMoreThanMaximum = array_merge($data, [AuthControllerInputs::FIELD_PASSWORD => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']);
 
         $responsePasswordMissing1 = $this->postJson('/api/login', $dataPasswordMissing1);
         $responsePasswordMissing2 = $this->postJson('/api/login', $dataPasswordMissing2);
         $responsePasswordWhitespace = $this->postJson('/api/login', $dataPasswordWhitespace);
         $responsePasswordMoreThanMaximum = $this->postJson('/api/login', $dataPasswordMoreThanMaximum);
 
-        $responsePasswordMissing1->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responsePasswordMissing1->assertBadRequest();
         $responsePasswordMissing1->assertJson(['code' => 0]);
-        $responsePasswordMissing2->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responsePasswordMissing2->assertBadRequest();
         $responsePasswordMissing2->assertJson(['code' => 0]);
-        $responsePasswordWhitespace->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responsePasswordWhitespace->assertBadRequest();
         $responsePasswordWhitespace->assertJson(['code' => 0]);
-        $responsePasswordMoreThanMaximum->assertStatus(Response::HTTP_BAD_REQUEST);
+        $responsePasswordMoreThanMaximum->assertBadRequest();
         $responsePasswordMoreThanMaximum->assertJson(['code' => 0]);
     }
 }
