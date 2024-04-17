@@ -64,6 +64,7 @@ class EventRepositoryEloquent implements EventRepository
     public function update(int $id, array $data): ?EventModel
     {
         $event = Event::whereId($id)->first();
+        if ($event === null) return null;
 
         if (key_exists('name', $data)) {
             $event->name = $data['name'];
