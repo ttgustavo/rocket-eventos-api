@@ -12,7 +12,7 @@ class UserRepositoryEloquent implements UserRepository
 {
     public function hasEmailRegistered(string $email): bool
     {
-        $entity = User::where("email", "=", $email)->first();
+        $entity = User::whereEmail($email)->first();
         return $entity !== null;
     }
 
@@ -27,7 +27,7 @@ class UserRepositoryEloquent implements UserRepository
         $entity->password = $password;
         $entity->save();
 
-        $user = new UserModel(
+        return new UserModel(
             $entity->id,
             $name,
             $email,
@@ -35,8 +35,6 @@ class UserRepositoryEloquent implements UserRepository
             $entity->updated_at,
             UserStatus::from($entity->status)
         );
-
-        return $user;
     }
 
 }
