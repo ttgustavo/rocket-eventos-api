@@ -46,9 +46,9 @@ class UpdateEventController extends ApiController
 
     private function validateParams(int|string $id): bool
     {
-        $inputs = ['id' => $id];
+        $inputs = [EventControllerInputs::FIELD_ID => $id];
         $rules = [
-            'id' => ['required', 'int', 'min:0'],
+            EventControllerInputs::FIELD_ID => ['required', 'int', 'min:0'],
         ];
 
         return Validator::make($inputs, $rules)->passes();
@@ -57,35 +57,35 @@ class UpdateEventController extends ApiController
     private function validateInputs(array $inputs): bool
     {
         $rules = [
-            'name' => ['nullable', 'string', 'filled', 'min:5', 'max:100'],
-            'slug' => ['nullable', 'string', 'filled', 'min:4', 'max:100', new SlugValidationRule],
-            'details' => ['nullable', 'string', 'filled', 'max:1000'],
-            'subscription_date_start' => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
-            'subscription_date_end' => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
-            'presentation_at' => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
-            'status' => ['nullable', 'int', 'min:0', 'max:4']
+            EventControllerInputs::FIELD_NAME => ['nullable', 'string', 'filled', 'min:5', 'max:100'],
+            EventControllerInputs::FIELD_SLUG => ['nullable', 'string', 'filled', 'min:4', 'max:100', new SlugValidationRule],
+            EventControllerInputs::FIELD_DETAILS => ['nullable', 'string', 'filled', 'max:1000'],
+            EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
+            EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
+            EventControllerInputs::FIELD_PRESENTATION_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
+            EventControllerInputs::FIELD_STATUS => ['nullable', 'int', 'min:0', 'max:4']
         ];
         return Validator::make($inputs, $rules)->passes();
     }
 
     private function validateDates(array $inputs): bool
     {
-        $hasSubscriptionDateStart = key_exists('subscription_date_start', $inputs);
-        $hasSubscriptionDateEnd = key_exists('subscription_date_end', $inputs);
-        $hasPresentationAt = key_exists('presentation_at', $inputs);
+        $hasSubscriptionDateStart = key_exists(EventControllerInputs::FIELD_SUBSCRIPTION_START_AT, $inputs);
+        $hasSubscriptionDateEnd = key_exists(EventControllerInputs::FIELD_SUBSCRIPTION_END_AT, $inputs);
+        $hasPresentationAt = key_exists(EventControllerInputs::FIELD_PRESENTATION_AT, $inputs);
 
         if ($hasSubscriptionDateStart) {
-            $date = Carbon::parse($inputs['subscription_date_start']);
+            $date = Carbon::parse($inputs[EventControllerInputs::FIELD_SUBSCRIPTION_START_AT]);
             $isValid = $date->year > 2020;
             if ($isValid === false) return false;
         }
         if ($hasSubscriptionDateEnd) {
-            $date = Carbon::parse($inputs['subscription_date_end']);
+            $date = Carbon::parse($inputs[EventControllerInputs::FIELD_SUBSCRIPTION_END_AT]);
             $isValid = $date->year > 2020;
             if ($isValid === false) return false;
         }
         if ($hasPresentationAt) {
-            $date = Carbon::parse($inputs['presentation_at']);
+            $date = Carbon::parse($inputs[EventControllerInputs::FIELD_PRESENTATION_AT]);
             $isValid = $date->year > 2020;
             if ($isValid === false) return false;
         }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controller\Api\Events;
 
+use App\Presenter\Http\Controllers\Api\Events\EventControllerInputs;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,11 +19,11 @@ class UpdateEventControllerTest extends TestCase
         Carbon::setTestNow('2024-01-01T15:00:00Z');
 
         $data = [
-            'name' => 'My Event',
-            'slug' => 'my-event',
-            'subscription_date_start' => '2024-01-02T00:00:00Z',
-            'subscription_date_end' => '2024-01-03T00:00:00Z',
-            'presentation_at' => '2024-01-10T00:00:00Z'
+            EventControllerInputs::FIELD_NAME => 'My Event',
+            EventControllerInputs::FIELD_SLUG => 'my-event',
+            EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => '2024-01-02T00:00:00Z',
+            EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => '2024-01-03T00:00:00Z',
+            EventControllerInputs::FIELD_PRESENTATION_AT => '2024-01-10T00:00:00Z'
         ];
         $response = parent::postJson('/api/admin/events', $data);
         $this->eventId = json_decode($response->content(), true)['id'];
@@ -31,24 +32,24 @@ class UpdateEventControllerTest extends TestCase
     public function test_returns_status_code_ok_with_data_when_updated(): void
     {
         $data = [
-            'name' => 'My Event Updated',
-            'slug' => 'my-event-updated',
-            'details' => 'My event details here.',
-            'subscription_date_start' => '2024-01-01T00:00:00Z',
-            'subscription_date_end' => '2024-01-01T00:00:00Z',
-            'presentation_at' => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_NAME => 'My Event Updated',
+            EventControllerInputs::FIELD_SLUG => 'my-event-updated',
+            EventControllerInputs::FIELD_DETAILS => 'My event details here.',
+            EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_PRESENTATION_AT => '2024-01-01T00:00:00Z',
             'status' => 1,
         ];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
         $response->assertOk();
-        $response->assertJsonStructure(['slug']);
+        $response->assertJsonStructure([EventControllerInputs::FIELD_SLUG]);
     }
 
     public function test_returns_status_code_ok_with_empty_data_when_updated_with_same_value(): void
     {
-        $data = ['slug' => 'my-event'];
+        $data = [EventControllerInputs::FIELD_SLUG => 'my-event'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -68,7 +69,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_1_when_event_does_not_exists(): void
     {
-        $data = ['slug' => 'my-event-updated'];
+        $data = [EventControllerInputs::FIELD_SLUG => 'my-event-updated'];
 
         $response = parent::patchJson('/api/admin/events/9541', $data);
 
@@ -80,12 +81,12 @@ class UpdateEventControllerTest extends TestCase
     public function test_returns_status_code_bad_request_with_code_0_data_when_one_field_is_invalid(): void
     {
         $data = [
-            'name' => 'My Event Updated',
-            'slug' => 'my-event-updated',
-            'details' => 'My event details here.',
-            'subscription_date_start' => '2024-01-01T00:00:00Z',
-            'subscription_date_end' => '2024-01-01T00:00:00Z',
-            'presentation_at' => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_NAME => 'My Event Updated',
+            EventControllerInputs::FIELD_SLUG => 'my-event-updated',
+            EventControllerInputs::FIELD_DETAILS => 'My event details here.',
+            EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => '2024-01-01T00:00:00Z',
+            EventControllerInputs::FIELD_PRESENTATION_AT => '2024-01-01T00:00:00Z',
             'status' => -1,
         ];
 
@@ -105,7 +106,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_name_is_empty(): void
     {
-        $data = ['name' => ''];
+        $data = [EventControllerInputs::FIELD_NAME => ''];
 
         $response = parent::patchJson('/api/admin/events/9541', $data);
 
@@ -115,7 +116,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_name_is_less_than_minimum(): void
     {
-        $data = ['name' => 'Abc'];
+        $data = [EventControllerInputs::FIELD_NAME => 'Abc'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -125,7 +126,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_slug_is_empty(): void
     {
-        $data = ['slug' => ''];
+        $data = [EventControllerInputs::FIELD_SLUG => ''];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -135,7 +136,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_slug_is_less_than_minimum(): void
     {
-        $data = ['slug' => 'abc'];
+        $data = [EventControllerInputs::FIELD_SLUG => 'abc'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -145,7 +146,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_details_is_empty(): void
     {
-        $data = ['details' => ''];
+        $data = [EventControllerInputs::FIELD_DETAILS => ''];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -157,7 +158,7 @@ class UpdateEventControllerTest extends TestCase
     {
         $details = '';
         $details = str_pad($details, 1001, 'a');
-        $data = ['details' => $details];
+        $data = [EventControllerInputs::FIELD_DETAILS => $details];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -167,7 +168,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_subscription_date_start_is_empty(): void
     {
-        $data = ['subscription_date_start' => ''];
+        $data = [EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => ''];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -177,7 +178,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_subscription_date_start_year_less_than_2020(): void
     {
-        $data = ['subscription_date_start' => '2019-03-01T15:00:00Z'];
+        $data = [EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => '2019-03-01T15:00:00Z'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -187,7 +188,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_subscription_date_end_year_less_than_2020(): void
     {
-        $data = ['subscription_date_end' => '2019-03-01T15:00:00Z'];
+        $data = [EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => '2019-03-01T15:00:00Z'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 
@@ -197,7 +198,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_returns_status_code_bad_request_with_code_0_when_presentation_at_year_less_than_2020(): void
     {
-        $data = ['presentation_at' => '2019-03-01T15:00:00Z'];
+        $data = [EventControllerInputs::FIELD_PRESENTATION_AT => '2019-03-01T15:00:00Z'];
 
         $response = parent::patchJson("/api/admin/events/{$this->eventId}", $data);
 

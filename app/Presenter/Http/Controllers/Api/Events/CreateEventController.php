@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CreateEventController extends ApiController
 {
-    private $repository;
+    private EventRepository $repository;
 
     public function __construct(EventRepository $repository)
     {
@@ -38,11 +38,11 @@ class CreateEventController extends ApiController
         }
 
         $slug = '';
-        $hasSlugInRequest = array_key_exists('slug', $json);
+        $hasSlugInRequest = array_key_exists(EventControllerInputs::FIELD_SLUG, $json);
         if ($hasSlugInRequest) {
-            $slug = $json['slug'];
+            $slug = $json[EventControllerInputs::FIELD_SLUG];
         } else {
-            $slug = $this->generateSlugFromString($json['name']);
+            $slug = $this->generateSlugFromString($json[EventControllerInputs::FIELD_NAME]);
         }
 
         $eventExists = $this->repository->hasEventWithSlug($slug);
@@ -52,17 +52,17 @@ class CreateEventController extends ApiController
         }
 
         $details = '';
-        if (key_exists('details', $json)) {
-            $details = $json['details'];
+        if (key_exists(EventControllerInputs::FIELD_DETAILS, $json)) {
+            $details = $json[EventControllerInputs::FIELD_DETAILS];
         }
 
         $event = $this->repository->create(
-            $json['name'],
+            $json[EventControllerInputs::FIELD_NAME],
             $slug,
             $details,
-            $json['subscription_date_start'],
-            $json['subscription_date_end'],
-            $json['presentation_at']
+            $json[EventControllerInputs::FIELD_SUBSCRIPTION_START_AT],
+            $json[EventControllerInputs::FIELD_SUBSCRIPTION_END_AT],
+            $json[EventControllerInputs::FIELD_PRESENTATION_AT]
         );
 
         return parent::responseCreated($event);
@@ -82,13 +82,14 @@ class CreateEventController extends ApiController
     private function validateInputs(array $inputs): \Illuminate\Validation\Validator
     {
         $rules = [
-            'name' => ['required', 'min:5', 'max:100'],
-            'slug' => ['nullable', 'string', 'max:100', new SlugValidationRule],
-            'details' => ['nullable', 'string', 'max:1000'],
-            'subscription_date_start' => ['required', 'string', 'date_format:Y-m-d\TH:i:sp', new DateTimeAfterNowRule],
-            'subscription_date_end' => ['required', 'string', 'date_format:Y-m-d\TH:i:sp', new DateTimeAfterNowRule],
-            'presentation_at' => ['required', 'string', 'date_format:Y-m-d\TH:i:sp'],
+            EventControllerInputs::FIELD_NAME => ['required', 'min:5', 'max:100'],
+            EventControllerInputs::FIELD_SLUG => ['nullable', 'string', 'max:100', new SlugValidationRule],
+            EventControllerInputs::FIELD_DETAILS => ['nullable', 'string', 'max:1000'],
+            EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => ['required', 'string', 'date_format:Y-m-d\TH:i:sp', new DateTimeAfterNowRule],
+            EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => ['required', 'string', 'date_format:Y-m-d\TH:i:sp', new DateTimeAfterNowRule],
+            EventControllerInputs::FIELD_PRESENTATION_AT => ['required', 'string', 'date_format:Y-m-d\TH:i:sp'],
         ];
+
         return Validator::make($inputs, $rules);
     }
 
@@ -96,13 +97,13 @@ class CreateEventController extends ApiController
     {
         $dateTimeNow = Carbon::now();
 
-        $dateTimeSubscriptionStartRaw = $input['subscription_date_start'];
+        $dateTimeSubscriptionStartRaw = $input[EventControllerInputs::FIELD_SUBSCRIPTION_START_AT];
         $dateTimeSubscriptionStart = Carbon::parse($dateTimeSubscriptionStartRaw);
 
-        $dateTimeSubscriptionEndRaw = $input['subscription_date_end'];
+        $dateTimeSubscriptionEndRaw = $input[EventControllerInputs::FIELD_SUBSCRIPTION_END_AT];
         $dateTimeSubscriptionEnd = Carbon::parse($dateTimeSubscriptionEndRaw);
 
-        $dateTimePresentationAtRaw = $input['presentation_at'];
+        $dateTimePresentationAtRaw = $input[EventControllerInputs::FIELD_PRESENTATION_AT];
         $dateTimePresentationAt = Carbon::parse($dateTimePresentationAtRaw);
 
         if ($dateTimeSubscriptionEnd->isBefore($dateTimeSubscriptionStart)) {
