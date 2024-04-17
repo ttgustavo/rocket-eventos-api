@@ -2,51 +2,53 @@
 
 namespace Tests\Feature\Controller\Api\Events;
 
+use App\Domain\Repository\EventRepository;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
 
 class DeleteEventControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private int $eventId = 0;
+    private EventRepository|MockObject $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
+
         Carbon::setTestNow('2024-01-01T00:00:00Z');
 
-        $data = [
-            'name' => 'My Event',
-            'slug' => 'my-event',
-            'subscription_date_start' => '2024-01-02T00:00:00Z',
-            'subscription_date_end' => '2024-01-03T00:00:00Z',
-            'presentation_at' => '2024-01-10T00:00:00Z'
-        ];
+        $this->repository = $this->getMockBuilder(EventRepository::class)->getMock();
 
-        $response = parent::postJson('/api/admin/events', $data);
-
-        $this->eventId = json_decode($response->content(), true)['id'];
+        $this->app->bind(EventRepository::class, function() {
+            return $this->repository;
+        });
     }
 
-    public function test_returns_status_code_no_content_when_deleted(): void
+    public function test_when_deleted_returns_status_code_no_content(): void
     {
-        $response = parent::delete("/api/admin/events/{$this->eventId}");
+        $this->repository->method('hasEventWithId')->willReturn(true);
+        $this->repository->expects($this->once())->method('delete');
+
+        $response = $this->deleteJson('/api/admin/events/1');
 
         $response->assertNoContent();
     }
 
-    public function test_returns_status_code_bad_request_with_code_1_when_event_does_not_exists(): void
+    public function test_when_event_does_not_exists_returns_status_code_bad_request_with_code_1(): void
     {
-        $response = parent::delete('/api/admin/events/9541');
+        $this->repository->method('hasEventWithId')->willReturn(false);
+
+        $response = parent::delete('/api/admin/events/1');
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 1]);
     }
 
     // ---- Validation
-    public function test_returns_status_code_bad_request_with_code_0_data_when_event_id_is_not_a_number(): void
+    public function test_when_event_id_is_not_a_number_returns_status_code_bad_request_with_code_0_data(): void
     {
         $response = parent::delete("/api/admin/events/abc");
 

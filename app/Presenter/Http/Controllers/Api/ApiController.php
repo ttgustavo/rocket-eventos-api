@@ -14,7 +14,7 @@ abstract class ApiController
 
     protected function responseNoContent(): JsonResponse
     {
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return response()->json([], Response::HTTP_NO_CONTENT);
     }
 
     protected function responseCreated(mixed $payload = null): JsonResponse

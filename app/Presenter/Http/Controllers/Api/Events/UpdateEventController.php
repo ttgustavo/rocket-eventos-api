@@ -39,7 +39,7 @@ class UpdateEventController extends ApiController
         $event = $this->repository->update($eventId, $json);
 
         $hasNoChanges = $event === null;
-        if ($hasNoChanges) return parent::responseOk();
+        if ($hasNoChanges) return parent::responseNoContent();
 
         return parent::responseOk($event);
     }
