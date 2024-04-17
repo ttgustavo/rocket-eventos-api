@@ -2,55 +2,41 @@
 
 namespace App\Presenter\Http\Controllers\Api\Auth;
 
-use App\Domain\Error\RegisterError;
-use App\Domain\Usecase\RegisterUsecase;
+use App\Domain\Repository\UserRepository;
 use App\Presenter\Http\Controllers\Api\ApiController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
 class AuthRegisterController extends ApiController
 {
-    private $usecase;
+    private UserRepository $repository;
 
-    public function __construct(RegisterUsecase $usecase)
+    public function __construct(UserRepository $repository)
     {
-        $this->usecase = $usecase;
+        $this->repository = $repository;
     }
 
     public function __invoke(Request $request): JsonResponse
     {
         $content = $request->getContent();
         $json = json_decode($content, true);
-        
-        $this->trim($json, ['password']);
-        
-        $validator = Validator::make(
-            $json,
-            [
-                'name' => 'required|min:3|max:150',
-                'email' => 'required|email:rfc,dns',
-                'password'=> 'required|min:8|max:100',
-            ]
-        );
-        if ($validator->fails()) {
-            $payload = ['code' => 0];
-            return response()->json($payload, Response::HTTP_BAD_REQUEST);
-        }
-        
-        $body = (object) $validator->validated();
-        $user = $this->usecase->__invoke($body->name, $body->email, $body->password);
 
-        if ($user instanceof RegisterError) {
-            $payload = [
-                'code' => 1,
-                'message' => 'E-mail already in use.'
-            ];
-            return response()->json($payload, Response::HTTP_BAD_REQUEST);
-        }
+        $this->trim($json, [AuthControllerInputs::FIELD_PASSWORD]);
 
-        return response()->json($user, Response::HTTP_CREATED);
+        $validator = $this->validateInputs($json);
+        if ($validator->fails()) return parent::responseBadRequest(['code' => 0]);
+
+        $json = $validator->valid();
+        $name = $json[AuthControllerInputs::FIELD_NAME];
+        $email = $json[AuthControllerInputs::FIELD_EMAIL];
+        $password = $json[AuthControllerInputs::FIELD_PASSWORD];
+
+        $hasEmailRegistered = $this->repository->hasEmailRegistered($email);
+        if ($hasEmailRegistered) return parent::responseBadRequest(['code' => 1]);
+
+        $user = $this->repository->insert($name, $email, $password);
+        return parent::responseCreated($user);
     }
 
     private function trim(array &$array, array $ignore = []): void
@@ -60,5 +46,16 @@ class AuthRegisterController extends ApiController
             if (in_array($key, $ignore)) continue;
             $array[$key] = trim($value);
         }
+    }
+
+    private function validateInputs(array $inputs): \Illuminate\Validation\Validator
+    {
+        $rules = [
+            AuthControllerInputs::FIELD_NAME => 'required|min:3|max:150',
+            AuthControllerInputs::FIELD_EMAIL => 'required|email:rfc,dns',
+            AuthControllerInputs::FIELD_PASSWORD => 'required|min:8|max:100'
+        ];
+
+        return Validator::make($inputs, $rules);
     }
 }

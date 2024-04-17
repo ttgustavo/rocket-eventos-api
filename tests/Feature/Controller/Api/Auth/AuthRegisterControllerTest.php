@@ -2,46 +2,68 @@
 
 namespace Tests\Feature\Controller\Api\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Domain\Model\UserModel;
+use App\Domain\Model\UserStatus;
+use App\Domain\Repository\UserRepository;
+use App\Presenter\Http\Controllers\Api\Auth\AuthControllerInputs;
+use Carbon\Carbon;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class AuthRegisterControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    private UserRepository|MockObject $repository;
 
-    public function test_returns_status_code_201_with_user_data_when_registered(): void
+    protected function setUp(): void
     {
+        parent::setUp();
+
+        $this->repository = $this->getMockBuilder(UserRepository::class)->getMock();
+
+        $this->app->bind(UserRepository::class, function() {
+            return $this->repository;
+        });
+    }
+
+    public function test_when_registered_returns_status_code_created_with_user_json(): void
+    {
+        $name = 'Gustavo';
+        $email = 'myemail@email.com';
+        $password = 'mypassword';
+        $user = $this->createUser($name, $email);
+
         $data = [
-            'name' => 'Gustavo',
-            'email' => 'myemail@email.com',
-            'password' => 'mypassword'
+            AuthControllerInputs::FIELD_NAME => $name,
+            AuthControllerInputs::FIELD_EMAIL => $email,
+            AuthControllerInputs::FIELD_PASSWORD => $password
         ];
+        $this->repository->method('hasEmailRegistered')->willReturn(false);
+        $this->repository->method('insert')->willReturn($user);
 
         $response = $this->postJson( '/api/register', $data);
-        $response->assertStatus(Response::HTTP_CREATED);
+        $response->assertCreated();
+        $response->assertJsonIsObject();
+        $response->assertJsonFragment(['name' => $name]);
     }
 
-    public function test_returns_status_code_400_when_email_is_already_registered_with_code_1(): void
+    public function test_when_email_is_already_registered_returns_bad_request_with_code_1(): void
     {
+        $this->repository->method('hasEmailRegistered')->willReturn(true);
+
         $data = [
-            'name' => 'Gustavo',
-            'email' => 'myemail@email.com',
-            'password' => 'mypassword'
+            AuthControllerInputs::FIELD_NAME => 'Gustavo',
+            AuthControllerInputs::FIELD_EMAIL => 'email@email.com',
+            AuthControllerInputs::FIELD_PASSWORD => '12345678'
         ];
-
-        $responseCreated = $this->postJson('/api/register', $data);
-        $responseCreated->assertStatus(Response::HTTP_CREATED);
-
         $response = $this->postJson('/api/register', $data);
-        $response->assertStatus(Response::HTTP_BAD_REQUEST);
-        $response->assertJson([
-            'code' => 1,
-            'message' => 'E-mail already in use.'
-        ]);
+
+        $response->assertBadRequest();
+        $response->assertJson(['code' => 1]);
     }
 
-    public function test_returns_bad_request_when_validation_name_fails_with_code_0(): void
+    // ---- Validation
+    public function test_when_validation_name_fails_returns_bad_request_with_code_0(): void
     {
         $data = ['email' => 'myemail@email.com', 'password' => 'password'];
 
@@ -77,7 +99,7 @@ class AuthRegisterControllerTest extends TestCase
         $responseNameMoreThanMaximum->assertJson(['code' => 0]);
     }
 
-    public function test_returns_bad_request_when_validation_email_fails_with_code_0(): void
+    public function test_when_validation_email_fails_returns_bad_request_with_code_0(): void
     {
         $data = ['name' => 'Gustavo', 'password' => 'password'];
 
@@ -109,7 +131,7 @@ class AuthRegisterControllerTest extends TestCase
         $responseWrongFormat4->assertJson(['code' => 0]);
     }
 
-    public function test_returns_bad_request_when_validation_password_fails_with_code_0(): void
+    public function test_when_validation_password_fails_returns_bad_request_with_code_0(): void
     {
         $data = ['name' => 'Gustavo', 'email' => 'email@email.com'];
 
@@ -135,5 +157,11 @@ class AuthRegisterControllerTest extends TestCase
         $responsePasswordLessThanMinimum->assertJson(['code' => 0]);
         $responsePasswordMoreThanMaximum->assertStatus(Response::HTTP_BAD_REQUEST);
         $responsePasswordMoreThanMaximum->assertJson(['code' => 0]);
+    }
+
+    private function createUser(string $name = '', string $email = ''): UserModel
+    {
+        $date = Carbon::now();
+        return new UserModel(1, $name, $email, $date, $date, UserStatus::Registered);
     }
 }
