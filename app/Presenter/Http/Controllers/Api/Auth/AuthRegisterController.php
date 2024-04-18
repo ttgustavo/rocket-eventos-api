@@ -3,10 +3,10 @@
 namespace App\Presenter\Http\Controllers\Api\Auth;
 
 use App\Domain\Repository\UserRepository;
+use App\Presenter\ArrayUtil;
 use App\Presenter\Http\Controllers\Api\ApiController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class AuthRegisterController extends ApiController
 {
@@ -22,9 +22,9 @@ class AuthRegisterController extends ApiController
         $content = $request->getContent();
         $json = json_decode($content, true);
 
-        $this->trim($json, [AuthControllerInputs::FIELD_PASSWORD]);
+        ArrayUtil::trimValues($json, [AuthControllerInputs::FIELD_PASSWORD]);
 
-        $validator = $this->validateInputs($json);
+        $validator = AuthValidation::validateRegister($json);
         if ($validator->fails()) return parent::responseBadRequest(['code' => 0]);
 
         $json = $validator->valid();
@@ -37,25 +37,5 @@ class AuthRegisterController extends ApiController
 
         $user = $this->repository->insert($name, $email, $password);
         return parent::responseCreated($user);
-    }
-
-    private function trim(array &$array, array $ignore = []): void
-    {
-        foreach ($array as $key => $value) {
-            if (is_string($value) === false) continue;
-            if (in_array($key, $ignore)) continue;
-            $array[$key] = trim($value);
-        }
-    }
-
-    private function validateInputs(array $inputs): \Illuminate\Validation\Validator
-    {
-        $rules = [
-            AuthControllerInputs::FIELD_NAME => 'required|min:3|max:150',
-            AuthControllerInputs::FIELD_EMAIL => 'required|email:rfc,dns',
-            AuthControllerInputs::FIELD_PASSWORD => 'required|min:8|max:100'
-        ];
-
-        return Validator::make($inputs, $rules);
     }
 }
