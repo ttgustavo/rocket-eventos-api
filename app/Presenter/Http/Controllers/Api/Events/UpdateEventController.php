@@ -63,7 +63,7 @@ class UpdateEventController extends ApiController
             EventControllerInputs::FIELD_SUBSCRIPTION_START_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
             EventControllerInputs::FIELD_SUBSCRIPTION_END_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
             EventControllerInputs::FIELD_PRESENTATION_AT => ['nullable', 'string', 'filled', 'date_format:Y-m-d\TH:i:sp'],
-            EventControllerInputs::FIELD_STATUS => ['nullable', 'int', 'min:0', 'max:4']
+            EventControllerInputs::FIELD_STATUS => ['nullable', 'int', 'min:0', 'max:5']
         ];
         return Validator::make($inputs, $rules)->passes();
     }

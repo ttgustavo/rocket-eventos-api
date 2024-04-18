@@ -5,8 +5,9 @@ namespace App\Domain\Model;
 enum EventStatus : int
 {
     case Draft = 0;
-    case SubscriptionsOpen = 1;
-    case SubscriptionsEnded = 2;
-    case Done = 3;
-    case Canceled = 4;
+    case Created = 1;
+    case SubscriptionsOpen = 2;
+    case SubscriptionsEnded = 3;
+    case Done = 4;
+    case Canceled = 5;
 }

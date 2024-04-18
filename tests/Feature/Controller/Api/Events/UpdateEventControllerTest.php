@@ -258,7 +258,7 @@ class UpdateEventControllerTest extends TestCase
 
     public function test_when_status_is_not_valid_returns_status_code_bad_request_with_code_0(): void
     {
-        $data1 = ['status' => 5];
+        $data1 = ['status' => 6];
         $data2 = ['status' => -1];
 
         $response1 = parent::patchJson("/api/admin/events/1", $data1);
