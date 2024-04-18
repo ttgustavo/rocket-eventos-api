@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presenter\Http\Controllers\Api\Auth;
+namespace App\Presenter\Http\Controllers\Api\Client\Auth;
 
 use App\Infrastructure\Eloquent\Models\User;
 use App\Presenter\ArrayUtil;

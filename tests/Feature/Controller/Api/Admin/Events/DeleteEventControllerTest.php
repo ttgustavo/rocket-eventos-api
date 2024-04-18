@@ -1,9 +1,7 @@
 <?php
 
-namespace Tests\Feature\Controller\Api\Events;
+namespace Tests\Feature\Controller\Api\Admin\Events;
 
-use App\Domain\Model\EventModel;
-use App\Domain\Model\EventStatus;
 use App\Domain\Repository\EventRepository;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;

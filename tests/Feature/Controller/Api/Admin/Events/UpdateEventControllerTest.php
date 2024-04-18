@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature\Controller\Api\Events;
+namespace Tests\Feature\Controller\Api\Admin\Events;
 
 use App\Domain\Model\EventModel;
 use App\Domain\Model\EventStatus;
 use App\Domain\Repository\EventRepository;
-use App\Presenter\Http\Controllers\Api\Events\EventControllerInputs;
+use App\Presenter\Http\Controllers\Api\Admin\Events\EventControllerInputs;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Feature\AuthHelperTrait;

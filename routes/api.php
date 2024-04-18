@@ -1,12 +1,12 @@
 <?php
 
 use App\Domain\Model\UserPermissions;
-use App\Presenter\Http\Controllers\Api\Auth\AuthLoginController;
-use App\Presenter\Http\Controllers\Api\Auth\AuthRegisterController;
-use App\Presenter\Http\Controllers\Api\Events\CreateEventController;
-use App\Presenter\Http\Controllers\Api\Events\DeleteEventController;
-use App\Presenter\Http\Controllers\Api\Events\GetEventController;
-use App\Presenter\Http\Controllers\Api\Events\UpdateEventController;
+use App\Presenter\Http\Controllers\Api\Admin\Events\CreateEventController;
+use App\Presenter\Http\Controllers\Api\Admin\Events\DeleteEventController;
+use App\Presenter\Http\Controllers\Api\Admin\Events\GetEventController;
+use App\Presenter\Http\Controllers\Api\Admin\Events\UpdateEventController;
+use App\Presenter\Http\Controllers\Api\Client\Auth\AuthLoginController;
+use App\Presenter\Http\Controllers\Api\Client\Auth\AuthRegisterController;
 use App\Presenter\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Route;
 

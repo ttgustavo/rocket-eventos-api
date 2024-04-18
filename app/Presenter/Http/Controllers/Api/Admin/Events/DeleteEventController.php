@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Presenter\Http\Controllers\Api\Events;
+namespace App\Presenter\Http\Controllers\Api\Admin\Events;
 
 use App\Domain\Repository\EventRepository;
 use App\Presenter\Http\Controllers\Api\ApiController;
-use App\Presenter\Rules\SlugValidationRule;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

@@ -1,16 +1,11 @@
 <?php
 
-namespace Tests\Feature\Controller\Api\Events;
+namespace Tests\Feature\Controller\Api\Admin\Events;
 
 use App\Domain\Model\EventModel;
 use App\Domain\Model\EventStatus;
-use App\Domain\Model\UserPermissions;
 use App\Domain\Repository\EventRepository;
 use Carbon\Carbon;
-use Database\Factories\EventFactory;
-use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\Feature\AuthHelperTrait;

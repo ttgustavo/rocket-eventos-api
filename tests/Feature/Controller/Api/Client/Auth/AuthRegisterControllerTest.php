@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature\Controller\Api\Auth;
+namespace Tests\Feature\Controller\Api\Client\Auth;
 
 use App\Domain\Model\UserModel;
 use App\Domain\Model\UserStatus;
 use App\Domain\Repository\UserRepository;
-use App\Presenter\Http\Controllers\Api\Auth\AuthControllerInputs;
+use App\Presenter\Http\Controllers\Api\Client\Auth\AuthControllerInputs;
 use Carbon\Carbon;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;

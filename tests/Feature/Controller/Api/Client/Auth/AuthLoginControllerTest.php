@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Feature\Controller\Api\Auth;
+namespace Tests\Feature\Controller\Api\Client\Auth;
 
-use App\Presenter\Http\Controllers\Api\Auth\AuthControllerInputs;
+use App\Presenter\Http\Controllers\Api\Client\Auth\AuthControllerInputs;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\NewAccessToken;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presenter\Http\Controllers\Api\Events;
+namespace App\Presenter\Http\Controllers\Api\Admin\Events;
 
 class EventControllerInputs
 {
