@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Model\UserPermissions;
 use App\Presenter\Http\Controllers\Api\Auth\AuthLoginController;
 use App\Presenter\Http\Controllers\Api\Auth\AuthRegisterController;
 use App\Presenter\Http\Controllers\Api\Events\CreateEventController;
@@ -17,8 +18,14 @@ Route::post('/login', AuthLoginController::class);
 Route::get('/', HomeController::class);
 
 // Admin routes
+$adminOrSuperAbility = UserPermissions::getStringPermissionForAdminAndSuper();
+
+// Events route
+Route::middleware(['auth:sanctum', "ability:$adminOrSuperAbility"])->prefix('/admin')->group(function() {
+    Route::post('/events', CreateEventController::class);
+    Route::patch('/events/{id}', UpdateEventController::class);
+    Route::delete('/events/{id}', DeleteEventController::class);
+    Route::get('/events/{slug}', GetEventController::class);
+});
+
 Route::get('/admin')->middleware('auth:sanctum');
-Route::post('/admin/events', CreateEventController::class);
-Route::get('/admin/events/{eventSlug}', GetEventController::class);
-Route::patch('/admin/events/{id}', UpdateEventController::class);
-Route::delete('/admin/events/{id}', DeleteEventController::class);

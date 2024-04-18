@@ -3,17 +3,22 @@
 namespace Tests\Feature\Controller\Api\Events;
 
 use App\Domain\Model\EventModel;
+use App\Domain\Model\EventStatus;
+use App\Domain\Model\UserPermissions;
 use App\Domain\Repository\EventRepository;
 use Carbon\Carbon;
 use Database\Factories\EventFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
+use Tests\Feature\AuthHelperTrait;
 use Tests\TestCase;
 
 class GetEventControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use AuthHelperTrait;
 
     private EventRepository|MockObject $repository;
 
@@ -21,17 +26,43 @@ class GetEventControllerTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow('2024-01-01T15:00:00Z');
+        $this->authAsAdminAndSuper();
 
         $this->repository = $this->getMockBuilder(EventRepository::class)->getMock();
 
-        $this->app->bind(EventRepository::class, function () {
-            return $this->repository;
-        });
+        $this->app->instance(EventRepository::class, $this->repository);
     }
 
     public function test_when_event_exists_returns_status_code_ok_with_event_json(): void
     {
+        $slug = 'my-event';
+        $event = $this->createEvent($slug);
+        $this->repository->method('getBySlug')->willReturn($event);
+
+        $response = $this->get("/api/admin/events/$slug");
+
+        $response->assertOk();
+        $response->assertJsonIsObject();
+    }
+
+    public function test_when_event_exists_with_user_admin_returns_status_code_ok_with_event_json(): void
+    {
+        $this->authAsAdmin();
+
+        $slug = 'my-event';
+        $event = $this->createEvent($slug);
+        $this->repository->method('getBySlug')->willReturn($event);
+
+        $response = $this->get("/api/admin/events/$slug");
+
+        $response->assertOk();
+        $response->assertJsonIsObject();
+    }
+
+    public function test_when_event_exists_with_user_super_returns_status_code_ok_with_event_json(): void
+    {
+        $this->authAsSuper();
+
         $slug = 'my-event';
         $event = $this->createEvent($slug);
         $this->repository->method('getBySlug')->willReturn($event);
@@ -52,6 +83,17 @@ class GetEventControllerTest extends TestCase
         $response->assertJson(['code' => 1]);
     }
 
+    public function test_when_user_is_not_admin_or_super_returns_status_code_forbidden(): void
+    {
+        $slug = 'my-event';
+        $this->authAsUser();
+
+        $response = $this->get("/api/admin/events/$slug");
+
+        $response->assertForbidden();
+    }
+
+    // ---- Validation
     public function test_when_slug_is_invalid_returns_status_code_bad_request_with_code_0(): void
     {
         $slug = 'my-event-';
@@ -62,8 +104,19 @@ class GetEventControllerTest extends TestCase
         $response->assertJson(['code' => 0]);
     }
 
-    private function createEvent(string $slug): EventModel
+    private function createEvent(string $name = '', string $slug = '', string $details = ''): EventModel
     {
-        return EventFactory::new(['slug' => $slug])->create()->toDomainModel();
+        return new EventModel(
+            1,
+            $name,
+            $slug,
+            $details,
+            Carbon::now(),
+            Carbon::now()->addHour(),
+            Carbon::now()->addDay(),
+            Carbon::now(),
+            Carbon::now(),
+            EventStatus::Draft
+        );
     }
 }

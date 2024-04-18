@@ -3,17 +3,17 @@
 namespace Tests\Feature\Controller\Api\Events;
 
 use App\Domain\Model\EventModel;
+use App\Domain\Model\EventStatus;
 use App\Domain\Repository\EventRepository;
 use App\Presenter\Http\Controllers\Api\Events\EventControllerInputs;
 use Carbon\Carbon;
-use Database\Factories\EventFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Tests\Feature\AuthHelperTrait;
 use Tests\TestCase;
 
 class UpdateEventControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use AuthHelperTrait;
 
     private EventRepository|MockObject $repository;
 
@@ -23,16 +23,46 @@ class UpdateEventControllerTest extends TestCase
 
         Carbon::setTestNow('2024-01-01T15:00:00Z');
 
+        $this->authAsAdminAndSuper();
+
         $this->repository = $this->getMockBuilder(EventRepository::class)->getMock();
 
-        $this->app->bind(EventRepository::class, function() {
-            return $this->repository;
-        });
+        $this->app->instance(EventRepository::class, $this->repository);
     }
 
     public function test_when_updated_returns_status_code_ok_with_event_json(): void
     {
         $event = $this->createEvent();
+        $this->repository->method('hasEventWithId')->willReturn(true);
+        $this->repository->method('update')->willReturn($event);
+
+        $data = [EventControllerInputs::FIELD_SLUG => 'my-event-updated'];
+        $response = parent::patchJson("/api/admin/events/1", $data);
+
+        $response->assertOk();
+        $response->assertJsonIsObject();
+        $response->assertJsonStructure(['name', 'slug', 'details']);
+    }
+
+    public function test_when_is_updating_with_admin_user_returns_status_code_ok_with_event_json(): void
+    {
+        $event = $this->createEvent();
+        $this->authAsAdmin();
+        $this->repository->method('hasEventWithId')->willReturn(true);
+        $this->repository->method('update')->willReturn($event);
+
+        $data = [EventControllerInputs::FIELD_SLUG => 'my-event-updated'];
+        $response = parent::patchJson("/api/admin/events/1", $data);
+
+        $response->assertOk();
+        $response->assertJsonIsObject();
+        $response->assertJsonStructure(['name', 'slug', 'details']);
+    }
+
+    public function test_when_is_updating_with_super_user_returns_status_code_ok_with_event_json(): void
+    {
+        $event = $this->createEvent();
+        $this->authAsSuper();
         $this->repository->method('hasEventWithId')->willReturn(true);
         $this->repository->method('update')->willReturn($event);
 
@@ -74,6 +104,17 @@ class UpdateEventControllerTest extends TestCase
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 1]);
+    }
+
+    public function test_when_updating_event__with_user_not_admin_or_super_returns_status_code_forbidden(): void
+    {
+        $this->authAsUser();
+        $this->repository->expects($this->never())->method('hasEventWithId');
+
+        $data = [EventControllerInputs::FIELD_SLUG => 'my-event-updated'];
+        $response = parent::patchJson('/api/admin/events/1', $data);
+
+        $response->assertForbidden();
     }
 
     // ---- Validation
@@ -229,9 +270,19 @@ class UpdateEventControllerTest extends TestCase
         $response2->assertJson(['code' => 0]);
     }
 
-    private function createEvent(string $slug = null): EventModel
+    private function createEvent(string $name = '', string $slug = '', string $details = ''): EventModel
     {
-        $attributes = is_null($slug) ? [] : ['slug'=> $slug];
-        return EventFactory::new($attributes)->create()->toDomainModel();
+        return new EventModel(
+            1,
+            $name,
+            $slug,
+            $details,
+            Carbon::now(),
+            Carbon::now()->addHour(),
+            Carbon::now()->addDay(),
+            Carbon::now(),
+            Carbon::now(),
+            EventStatus::Draft
+        );
     }
 }
