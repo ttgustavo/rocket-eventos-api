@@ -8,9 +8,9 @@ use Laravel\Sanctum\Sanctum;
 
 trait AuthHelperTrait
 {
-    private function authAsUser(): void
+    private function authAsUser(int $id = 1): void
     {
-        Sanctum::actingAs(UserFactory::new()->makeOne());
+        Sanctum::actingAs(UserFactory::new(['id' => $id])->makeOne());
     }
 
     private function authAsAdmin(): void

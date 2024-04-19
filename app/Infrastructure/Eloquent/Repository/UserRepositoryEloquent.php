@@ -16,6 +16,12 @@ class UserRepositoryEloquent implements UserRepository
         return $entity !== null;
     }
 
+    public function getPasswordFromUser(int $id): string
+    {
+        $user = User::whereId($id)->first(['password']);
+        return $user->password;
+    }
+
     public function insert(
         string $name,
         string $email,
@@ -37,4 +43,15 @@ class UserRepositoryEloquent implements UserRepository
         );
     }
 
+    public function update(int $id, ?string $name, ?string $email, ?string $password): UserModel
+    {
+        $user = User::whereId($id)->first();
+
+        if (is_null($name) === false) $user->name = $name;
+        if (is_null($email) === false) $user->email = $email;
+        if (is_null($password) === false) $user->password = $password;
+
+        $user->save();
+        return $user->toDomainModel();
+    }
 }

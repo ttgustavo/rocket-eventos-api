@@ -3,6 +3,8 @@
 namespace App\Infrastructure\Eloquent\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Domain\Model\UserModel;
+use App\Domain\Model\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -74,5 +76,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function toDomainModel(): UserModel
+    {
+        return new UserModel(
+            $this->id,
+            $this->name,
+            $this->email,
+            $this->created_at,
+            $this->updated_at,
+            UserStatus::from($this->status)
+        );
     }
 }
