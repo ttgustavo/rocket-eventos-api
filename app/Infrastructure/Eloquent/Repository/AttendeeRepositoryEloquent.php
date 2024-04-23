@@ -19,4 +19,9 @@ class AttendeeRepositoryEloquent implements AttendeeRepository
         $attendee->user_id = $userId;
         $attendee->save();
     }
+
+    public function remove(int $eventId, int $userId): void
+    {
+        Attendee::whereEventId($eventId)->whereUserId($userId)->delete();
+    }
 }

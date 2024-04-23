@@ -63,4 +63,13 @@ class AttendeeRepositoryEloquentTest extends TestCase
         $this->assertSame($event->name, $eventFromAttendee->name);
         $this->assertSame($user->name, $userFromAttendee->name);
     }
+
+    public function test_remove(): void
+    {
+        AttendeeFactory::new(['event_id' => 10, 'user_id' => 23])->create();
+
+        $this->repository->remove(10, 23);
+
+        $this->assertDatabaseMissing(Attendee::class, ['event_id' => 10, 'user_id' => 23]);
+    }
 }

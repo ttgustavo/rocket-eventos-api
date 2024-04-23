@@ -20,9 +20,9 @@ class AttendeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => fake()->randomDigit(),
-            'event_id' => fake()->randomDigit(),
-            'status' => fake()->numberBetween(0, 2)
+            'user_id' => fake()->numberBetween(100000, 999999),
+            'event_id' => fake()->numberBetween(100000, 999999),
+            'status' => fake()->numberBetween(100000, 999999)
         ];
     }
 }

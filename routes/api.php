@@ -6,6 +6,7 @@ use App\Presenter\Http\Controllers\Api\Admin\Events\DeleteEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\GetEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\UpdateEventController;
 use App\Presenter\Http\Controllers\Api\Client\Attendee\RegisterAttendeeController;
+use App\Presenter\Http\Controllers\Api\Client\Attendee\RemoveAttendeeController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthLoginController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthRegisterController;
 use App\Presenter\Http\Controllers\Api\Client\User\UpdateUserController;
@@ -27,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // Attendee routes
     Route::post('/events/{eventId}/attendees', RegisterAttendeeController::class);
+    Route::delete('/events/{eventId}/attendees', RemoveAttendeeController::class);
 });
 
 // ---- Admin routes
