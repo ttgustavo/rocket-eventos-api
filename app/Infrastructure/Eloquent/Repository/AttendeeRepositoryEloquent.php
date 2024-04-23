@@ -3,13 +3,13 @@
 namespace App\Infrastructure\Eloquent\Repository;
 
 use App\Domain\Repository\AttendeeRepository;
+use App\Infrastructure\Eloquent\Models\Attendee;
 
 class AttendeeRepositoryEloquent implements AttendeeRepository
 {
     public function isAlreadyAnAttendee(int $eventId, int $userId): bool
     {
-        // TODO: Implementation
-        return true;
+        return Attendee::whereEventId($eventId)->whereUserId($userId)->exists();
     }
 
     public function create(int $eventId, int $userId): void
