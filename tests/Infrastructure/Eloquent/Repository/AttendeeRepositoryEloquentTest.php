@@ -47,18 +47,17 @@ class AttendeeRepositoryEloquentTest extends TestCase
         $event = EventFactory::new()->create();
         $user = UserFactory::new()->create();
 
-        $attendee = new Attendee();
-        $attendee->event_id = $event->id;
-        $attendee->user_id = $user->id;
-        $attendee->save();
+
+        $this->repository->create($event->id, $user->id);
 
 
         $attendeeExists = Attendee::whereEventId($event->id)->whereUserId($user->id)->exists();
+        $attendee = Attendee::whereEventId($event->id)->whereUserId($user->id)->first();
+
         /** @var User $userFromAttendee */
         $userFromAttendee = $attendee->user()->first();
         /** @var Event $eventFromAttendee */
         $eventFromAttendee = $attendee->event()->first();
-
 
         $this->assertSame(true, $attendeeExists);
         $this->assertSame($event->name, $eventFromAttendee->name);

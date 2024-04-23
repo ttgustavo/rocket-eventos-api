@@ -14,6 +14,9 @@ class AttendeeRepositoryEloquent implements AttendeeRepository
 
     public function create(int $eventId, int $userId): void
     {
-        // TODO: Implementation
+        $attendee = new Attendee();
+        $attendee->event_id = $eventId;
+        $attendee->user_id = $userId;
+        $attendee->save();
     }
 }

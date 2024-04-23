@@ -34,6 +34,8 @@ class Attendee extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'event_id',
+        'user_id',
         'status',
         'checkin_at'
     ];
