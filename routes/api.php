@@ -5,6 +5,7 @@ use App\Presenter\Http\Controllers\Api\Admin\Events\CreateEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\DeleteEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\GetEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\UpdateEventController;
+use App\Presenter\Http\Controllers\Api\Client\Attendee\RegisterAttendeeController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthLoginController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthRegisterController;
 use App\Presenter\Http\Controllers\Api\Client\User\UpdateUserController;
@@ -17,9 +18,15 @@ Route::get('/', HomeController::class);
 Route::post('/register', AuthRegisterController::class);
 Route::post('/login', AuthLoginController::class);
 
-// ----- User routes
-Route::middleware('auth:sanctum')->prefix('/users')->group(function() {
-    Route::patch('/', UpdateUserController::class);
+// ----- Authenticated routes
+Route::middleware('auth:sanctum')->group(function() {
+    // User routes
+    Route::prefix('/users')->group(function() {
+        Route::patch('/', UpdateUserController::class);
+    });
+
+    // Attendee routes
+    Route::post('/events/{eventId}/attendees', RegisterAttendeeController::class);
 });
 
 // ---- Admin routes
