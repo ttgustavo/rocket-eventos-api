@@ -18,6 +18,7 @@ interface EventRepository
         string $presentationAt,
     ): EventModel;
 
+    public function getById(int $id): ?EventModel;
     public function getBySlug(string $slug): ?EventModel;
 
     public function update(int $id, array $data): ?EventModel;

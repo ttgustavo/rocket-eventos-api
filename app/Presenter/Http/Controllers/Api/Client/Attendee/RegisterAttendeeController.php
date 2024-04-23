@@ -2,9 +2,11 @@
 
 namespace App\Presenter\Http\Controllers\Api\Client\Attendee;
 
+use App\Domain\Model\EventStatus;
 use App\Domain\Repository\AttendeeRepository;
 use App\Domain\Repository\EventRepository;
 use App\Presenter\Http\Controllers\Api\ApiController;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +27,15 @@ class RegisterAttendeeController extends ApiController
         $validation = RegisterAttendeeValidation::validateParams($eventId);
         if ($validation->fails()) return parent::responseBadRequest(['code' => 0]);
 
-        $hasEventWithId = $this->eventRepository->hasEventWithId($eventId);
-        if ($hasEventWithId === false) return parent::responseBadRequest(['code' => 1]);
+        $event = $this->eventRepository->getById($eventId);
+        if (is_null($event)) return parent::responseBadRequest(['code' => 1]);
+
+        $dateTimeNow = Carbon::now();
+        $isEventSubscriptionsOpen = $dateTimeNow->betweenIncluded($event->subscriptionStart, $event->subscriptionEnd);
+        if ($isEventSubscriptionsOpen === false) return parent::responseBadRequest(['code' => 1]);
+
+        $isEventSubscriptionsOpen = $event->status == EventStatus::SubscriptionsOpen;
+        if ($isEventSubscriptionsOpen === false) return parent::responseBadRequest(['code' => 1]);
 
         $userId = Auth::id();
 

@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Controller\Api\Client\Attendee;
 
+use App\Domain\Model\EventModel;
+use App\Domain\Model\EventStatus;
 use App\Domain\Repository\AttendeeRepository;
 use App\Domain\Repository\EventRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Tests\Feature\AuthHelperTrait;
 use Tests\TestCase;
@@ -28,9 +31,11 @@ class RegisterAttendeeControllerTest extends TestCase
 
     public function test_when_attendee_was_registered_returns_status_code_created(): void
     {
+        $event = $this->createEvent(EventStatus::SubscriptionsOpen);
+
         $this->authAsUser();
 
-        $this->eventRepository->method('hasEventWithId')->willReturn(true);
+        $this->eventRepository->method('getById')->willReturn($event);
         $this->attendeeRepository->method('isAlreadyAnAttendee')->willReturn(false);
 
         $this->attendeeRepository->expects($this->once())->method('create');
@@ -44,9 +49,11 @@ class RegisterAttendeeControllerTest extends TestCase
 
     public function test_when_attendee_was_already_registered_returns_status_code_ok(): void
     {
+        $event = $this->createEvent(EventStatus::SubscriptionsOpen);
+
         $this->authAsUser();
 
-        $this->eventRepository->method('hasEventWithId')->willReturn(true);
+        $this->eventRepository->method('getById')->willReturn($event);
         $this->attendeeRepository->method('isAlreadyAnAttendee')->willReturn(true);
 
         $this->attendeeRepository->expects($this->never())->method('create');
@@ -62,10 +69,29 @@ class RegisterAttendeeControllerTest extends TestCase
     {
         $this->authAsUser();
 
-        $this->eventRepository->method('hasEventWithId')->willReturn(false);
+        $this->eventRepository->method('getById')->willReturn(null);
 
         $this->attendeeRepository->expects($this->never())->method('create');
         $this->attendeeRepository->expects($this->never())->method('isAlreadyAnAttendee');
+
+
+        $response = $this->post('/api/events/1/attendees');
+
+
+        $response->assertBadRequest();
+        $response->assertJson(['code' => 1]);
+    }
+
+    public function test_when_subscribing_to_event_where_subscriptions_not_opened_returns_status_code_bad_request_with_code_1(): void
+    {
+        $start = Carbon::now()->addHour();
+        $end = $start->addHour();
+        $event = $this->createEvent(EventStatus::SubscriptionsOpen, $start, $end);
+
+        $this->authAsUser();
+
+        $this->eventRepository->method('getById')->willReturn($event);
+        $this->eventRepository->method('hasEventWithId')->willReturn(true);
 
 
         $response = $this->post('/api/events/1/attendees');
@@ -86,5 +112,25 @@ class RegisterAttendeeControllerTest extends TestCase
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 0]);
+    }
+
+    private function createEvent(
+        EventStatus $status,
+        ?Carbon $subscriptionStart = null,
+        ?Carbon $subscriptionEnd = null
+    ): EventModel
+    {
+        return new EventModel(
+            1,
+            'My Event',
+            'my-event',
+            '',
+            $subscriptionStart ?? Carbon::now(),
+            $subscriptionEnd ?? Carbon::now()->addHour(),
+            Carbon::now(),
+            Carbon::now(),
+            Carbon::now(),
+            $status
+        );
     }
 }

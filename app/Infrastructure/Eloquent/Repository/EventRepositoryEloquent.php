@@ -53,6 +53,14 @@ class EventRepositoryEloquent implements EventRepository
         );
     }
 
+    public function getById(int $id): ?EventModel
+    {
+        $entity = Event::whereId($id)->first();
+        if (is_null($entity)) return null;
+
+        return $entity->toDomainModel();
+    }
+
     public function getBySlug(string $slug): ?EventModel
     {
         $entity = Event::whereSlug($slug)->first();
