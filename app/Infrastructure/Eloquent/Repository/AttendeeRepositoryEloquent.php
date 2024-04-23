@@ -7,7 +7,7 @@ use App\Infrastructure\Eloquent\Models\Attendee;
 
 class AttendeeRepositoryEloquent implements AttendeeRepository
 {
-    public function isAlreadyAnAttendee(int $eventId, int $userId): bool
+    public function hasUserInEvent(int $eventId, int $userId): bool
     {
         return Attendee::whereEventId($eventId)->whereUserId($userId)->exists();
     }

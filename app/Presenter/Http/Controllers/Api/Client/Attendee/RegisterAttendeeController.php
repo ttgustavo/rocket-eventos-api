@@ -39,7 +39,7 @@ class RegisterAttendeeController extends ApiController
 
         $userId = Auth::id();
 
-        $isAlreadyAnAttendee = $this->attendeeRepository->isAlreadyAnAttendee($eventId, $userId);
+        $isAlreadyAnAttendee = $this->attendeeRepository->hasUserInEvent($eventId, $userId);
         if ($isAlreadyAnAttendee) return parent::responseOk();
 
         $this->attendeeRepository->create($eventId, $userId);

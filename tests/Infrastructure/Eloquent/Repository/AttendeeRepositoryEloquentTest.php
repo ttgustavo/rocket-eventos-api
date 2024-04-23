@@ -30,14 +30,14 @@ class AttendeeRepositoryEloquentTest extends TestCase
     {
         AttendeeFactory::new(['event_id' => 22, 'user_id' => 10])->create();
 
-        $isAlreadyAnAttendee = $this->repository->isAlreadyAnAttendee(22, 10);
+        $isAlreadyAnAttendee = $this->repository->hasUserInEvent(22, 10);
 
         $this->assertSame(true, $isAlreadyAnAttendee);
     }
 
     public function test_isAlreadyAnAttendee_returnsFalseWhenNotExists(): void
     {
-        $isAlreadyAnAttendee = $this->repository->isAlreadyAnAttendee(10, 23);
+        $isAlreadyAnAttendee = $this->repository->hasUserInEvent(10, 23);
 
         $this->assertSame(false, $isAlreadyAnAttendee);
     }

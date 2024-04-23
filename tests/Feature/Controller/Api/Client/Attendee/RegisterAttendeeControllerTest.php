@@ -36,7 +36,7 @@ class RegisterAttendeeControllerTest extends TestCase
         $this->authAsUser();
 
         $this->eventRepository->method('getById')->willReturn($event);
-        $this->attendeeRepository->method('isAlreadyAnAttendee')->willReturn(false);
+        $this->attendeeRepository->method('hasUserInEvent')->willReturn(false);
 
         $this->attendeeRepository->expects($this->once())->method('create');
 
@@ -54,7 +54,7 @@ class RegisterAttendeeControllerTest extends TestCase
         $this->authAsUser();
 
         $this->eventRepository->method('getById')->willReturn($event);
-        $this->attendeeRepository->method('isAlreadyAnAttendee')->willReturn(true);
+        $this->attendeeRepository->method('hasUserInEvent')->willReturn(true);
 
         $this->attendeeRepository->expects($this->never())->method('create');
 
@@ -72,7 +72,7 @@ class RegisterAttendeeControllerTest extends TestCase
         $this->eventRepository->method('getById')->willReturn(null);
 
         $this->attendeeRepository->expects($this->never())->method('create');
-        $this->attendeeRepository->expects($this->never())->method('isAlreadyAnAttendee');
+        $this->attendeeRepository->expects($this->never())->method('hasUserInEvent');
 
 
         $response = $this->post('/api/events/1/attendees');
@@ -106,7 +106,7 @@ class RegisterAttendeeControllerTest extends TestCase
         $this->authAsUser();
 
         $this->attendeeRepository->expects($this->never())->method('create');
-        $this->attendeeRepository->expects($this->never())->method('isAlreadyAnAttendee');
+        $this->attendeeRepository->expects($this->never())->method('hasUserInEvent');
 
         $response = $this->post('/api/events/abcd234ef/attendees');
 
