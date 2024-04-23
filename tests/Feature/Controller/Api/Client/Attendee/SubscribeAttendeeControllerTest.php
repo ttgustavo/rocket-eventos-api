@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Tests\Feature\AuthHelperTrait;
 use Tests\TestCase;
 
-class RemoveAttendeeControllerTest extends TestCase
+class SubscribeAttendeeControllerTest extends TestCase
 {
     use AuthHelperTrait;
 
@@ -28,25 +28,7 @@ class RemoveAttendeeControllerTest extends TestCase
         $this->app->instance(EventRepository::class, $this->eventRepository);
     }
 
-    public function test_when_attendee_is_removed_returns_status_code_no_content(): void
-    {
-        $event = $this->createEvent(EventStatus::SubscriptionsOpen);
-
-        $this->authAsUser();
-
-        $this->eventRepository->method('getById')->willReturn($event);
-        $this->attendeeRepository->method('hasUserInEvent')->willReturn(true);
-
-        $this->attendeeRepository->expects($this->once())->method('remove');
-
-
-        $response = $this->delete('/api/events/1/attendees');
-
-
-        $response->assertNoContent();
-    }
-
-    public function test_when_attendee_is_not_registered_returns_status_code_bad_request_with_code_1(): void
+    public function test_when_attendee_was_registered_returns_status_code_created(): void
     {
         $event = $this->createEvent(EventStatus::SubscriptionsOpen);
 
@@ -55,13 +37,31 @@ class RemoveAttendeeControllerTest extends TestCase
         $this->eventRepository->method('getById')->willReturn($event);
         $this->attendeeRepository->method('hasUserInEvent')->willReturn(false);
 
+        $this->attendeeRepository->expects($this->once())->method('create');
+
+
+        $response = $this->post('/api/events/1/attendees');
+
+
+        $response->assertCreated();
+    }
+
+    public function test_when_attendee_was_already_registered_returns_status_code_ok(): void
+    {
+        $event = $this->createEvent(EventStatus::SubscriptionsOpen);
+
+        $this->authAsUser();
+
+        $this->eventRepository->method('getById')->willReturn($event);
+        $this->attendeeRepository->method('hasUserInEvent')->willReturn(true);
+
         $this->attendeeRepository->expects($this->never())->method('create');
 
 
-        $response = $this->delete('/api/events/1/attendees');
+        $response = $this->post('/api/events/1/attendees');
 
 
-        $response->assertBadRequest();
+        $response->assertOk();
     }
 
     public function test_when_event_does_not_exists_returns_status_code_bad_request_with_code_1(): void
@@ -70,22 +70,22 @@ class RemoveAttendeeControllerTest extends TestCase
 
         $this->eventRepository->method('getById')->willReturn(null);
 
-        $this->attendeeRepository->expects($this->never())->method('remove');
+        $this->attendeeRepository->expects($this->never())->method('create');
         $this->attendeeRepository->expects($this->never())->method('hasUserInEvent');
 
 
-        $response = $this->delete('/api/events/1/attendees');
+        $response = $this->post('/api/events/1/attendees');
 
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 1]);
     }
 
-    public function test_when_subscribing_to_event_where_event_is_done_returns_status_code_bad_request_with_code_1(): void
+    public function test_when_subscribing_to_event_where_subscriptions_not_opened_returns_status_code_bad_request_with_code_1(): void
     {
         $start = Carbon::now()->addHour();
         $end = $start->addHour();
-        $event = $this->createEvent(EventStatus::Done, $start, $end);
+        $event = $this->createEvent(EventStatus::SubscriptionsOpen, $start, $end);
 
         $this->authAsUser();
 
@@ -93,7 +93,7 @@ class RemoveAttendeeControllerTest extends TestCase
         $this->eventRepository->method('hasEventWithId')->willReturn(true);
 
 
-        $response = $this->delete('/api/events/1/attendees');
+        $response = $this->post('/api/events/1/attendees');
 
 
         $response->assertBadRequest();
@@ -104,10 +104,10 @@ class RemoveAttendeeControllerTest extends TestCase
     {
         $this->authAsUser();
 
-        $this->attendeeRepository->expects($this->never())->method('remove');
+        $this->attendeeRepository->expects($this->never())->method('create');
         $this->attendeeRepository->expects($this->never())->method('hasUserInEvent');
 
-        $response = $this->delete('/api/events/abcd234ef/attendees');
+        $response = $this->post('/api/events/abcd234ef/attendees');
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 0]);

@@ -6,12 +6,11 @@ use App\Domain\Model\EventStatus;
 use App\Domain\Repository\AttendeeRepository;
 use App\Domain\Repository\EventRepository;
 use App\Presenter\Http\Controllers\Api\ApiController;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RegisterAttendeeController extends ApiController
+class UnsubscribeAttendeeController extends ApiController
 {
     private AttendeeRepository $attendeeRepository;
     private EventRepository $eventRepository;
@@ -30,20 +29,15 @@ class RegisterAttendeeController extends ApiController
         $event = $this->eventRepository->getById($eventId);
         if (is_null($event)) return parent::responseBadRequest(['code' => 1]);
 
-        $dateTimeNow = Carbon::now();
-        $isEventSubscriptionsOpen = $dateTimeNow->betweenIncluded($event->subscriptionStart, $event->subscriptionEnd);
-        if ($isEventSubscriptionsOpen === false) return parent::responseBadRequest(['code' => 1]);
-
-        $isEventSubscriptionsOpen = $event->status == EventStatus::SubscriptionsOpen;
-        if ($isEventSubscriptionsOpen === false) return parent::responseBadRequest(['code' => 1]);
+        $isEventDone = $event->status == EventStatus::Done;
+        if ($isEventDone) return parent::responseBadRequest(['code' => 1]);
 
         $userId = Auth::id();
 
-        $isAlreadyAnAttendee = $this->attendeeRepository->hasUserInEvent($eventId, $userId);
-        if ($isAlreadyAnAttendee) return parent::responseOk();
+        $hasUserInEvent = $this->attendeeRepository->hasUserInEvent($eventId, $userId);
+        if ($hasUserInEvent === false) return parent::responseBadRequest(['code' => 1]);
 
-        $this->attendeeRepository->create($eventId, $userId);
-
-        return parent::responseCreated();
+        $this->attendeeRepository->remove($eventId, $userId);
+        return parent::responseNoContent();
     }
 }
