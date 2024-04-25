@@ -3,6 +3,7 @@
 namespace App\Domain\Repository;
 
 use App\Domain\Model\EventModel;
+use App\Domain\Pagination\ModelPagination;
 
 interface EventRepository
 {
@@ -17,6 +18,8 @@ interface EventRepository
         string $subscriptionDateEnd,
         string $presentationAt,
     ): EventModel;
+
+    public function getAll(int $page = 1): ModelPagination;
 
     public function getById(int $id): ?EventModel;
     public function getBySlug(string $slug): ?EventModel;

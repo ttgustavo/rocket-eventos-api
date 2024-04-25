@@ -9,6 +9,7 @@ use App\Presenter\Http\Controllers\Api\Client\Attendee\SubscribeAttendeeControll
 use App\Presenter\Http\Controllers\Api\Client\Attendee\UnsubscribeAttendeeController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthLoginController;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthRegisterController;
+use App\Presenter\Http\Controllers\Api\Client\Event\GetEventsController;
 use App\Presenter\Http\Controllers\Api\Client\User\UpdateUserController;
 use App\Presenter\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::prefix('/users')->group(function() {
         Route::patch('/', UpdateUserController::class);
     });
+
+    // Event routes
+    Route::get('/events', GetEventsController::class);
 
     // Attendee routes
     Route::post('/events/{eventId}/attendees', SubscribeAttendeeController::class);

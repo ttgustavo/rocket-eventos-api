@@ -26,7 +26,7 @@ class EventFactory extends Factory
             'subscription_date_start' => now(),
             'subscription_date_end' => now()->addHours(2),
             'presentation_at' => now()->addDays(3),
-            'status' => fake()->numberBetween(0, 4)
+            'status' => fake()->numberBetween(0, 5)
         ];
     }
 }

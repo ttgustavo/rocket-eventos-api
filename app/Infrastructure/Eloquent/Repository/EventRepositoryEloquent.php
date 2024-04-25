@@ -4,9 +4,11 @@ namespace App\Infrastructure\Eloquent\Repository;
 
 use App\Domain\Model\EventModel;
 use App\Domain\Model\EventStatus;
+use App\Domain\Pagination\ModelPagination;
 use App\Domain\Repository\EventRepository;
 use App\Infrastructure\Eloquent\Models\Event;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class EventRepositoryEloquent implements EventRepository
 {
@@ -50,6 +52,23 @@ class EventRepositoryEloquent implements EventRepository
             $event->created_at,
             $event->updated_at,
             EventStatus::from($event->status)
+        );
+    }
+
+    public function getAll(int $page = 1): ModelPagination
+    {
+        $query = DB::table('events')
+            ->where('status', '=', EventStatus::Created)
+            ->orWhere('status', '=', EventStatus::SubscriptionsOpen);
+
+        $total = $query->count('1');
+        $pagination = $query->orderBy('updated_at', 'desc')->simplePaginate(page: $page);
+
+        return new ModelPagination(
+            $pagination->items(),
+            $total,
+            $pagination->nextPageUrl(),
+            $pagination->previousPageUrl()
         );
     }
 

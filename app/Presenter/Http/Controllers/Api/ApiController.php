@@ -12,6 +12,11 @@ abstract class ApiController
         return response()->json($payload, Response::HTTP_OK);
     }
 
+    protected function responseOkJson(string $json): JsonResponse
+    {
+        return JsonResponse::fromJsonString($json, Response::HTTP_OK);
+    }
+
     protected function responseNoContent(): JsonResponse
     {
         return response()->json([], Response::HTTP_NO_CONTENT);
