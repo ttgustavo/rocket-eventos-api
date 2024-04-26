@@ -6,6 +6,7 @@ use App\Domain\Model\EventModel;
 use App\Domain\Model\EventStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
@@ -55,6 +56,11 @@ class Event extends Model
             'subscription_date_end' => 'datetime',
             'presentation_at' => 'datetime',
         ];
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, Attendee::class);
     }
 
     public function toDomainModel(): EventModel

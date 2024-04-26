@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Eloquent\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int $user_id
@@ -25,11 +25,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method \Illuminate\Database\Eloquent\Builder|Attendee whereUserId(int $id)
  * @method \Illuminate\Database\Eloquent\Builder|Attendee whereStatus()
  */
-class Attendee extends Model
+class Attendee extends Pivot
 {
     use HasFactory;
 
     const CREATED_AT = 'subscribed_at';
+
+    protected $table = 'attendees';
 
     public $timestamps = true;
 
