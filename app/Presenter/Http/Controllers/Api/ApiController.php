@@ -31,4 +31,9 @@ abstract class ApiController
     {
         return response()->json($payload, Response::HTTP_BAD_REQUEST);
     }
+
+    protected function responseForbidden(array $payload = null): JsonResponse
+    {
+        return response()->json($payload, Response::HTTP_FORBIDDEN);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controller\Api\Client\Auth;
 
+use App\Domain\Repository\UserRepository;
 use App\Presenter\Http\Controllers\Api\Client\Auth\AuthControllerInputs;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,16 @@ use Tests\TestCase;
 
 class AuthLoginControllerTest extends TestCase
 {
+    private UserRepository $repository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->repository = $this->getMockBuilder(UserRepository::class)->getMock();
+        $this->app->instance(UserRepository::class, $this->repository);
+    }
+
     public function test_when_authenticated_returns_status_code_200_with_token(): void
     {
         $personalAccessToken = new PersonalAccessToken();
@@ -23,6 +34,7 @@ class AuthLoginControllerTest extends TestCase
             ->getMock();
         Auth::shouldReceive('once')->once()->andReturn(true);
         Auth::shouldReceive('user')->andReturn($userMocked);
+        $this->repository->method('isBanned')->willReturn(false);
 
         $dataLogin = [
             AuthControllerInputs::FIELD_EMAIL => 'email@email.com',
@@ -47,6 +59,20 @@ class AuthLoginControllerTest extends TestCase
 
         $response->assertBadRequest();
         $response->assertJson(['code' => 1]);
+    }
+
+    public function test_when_authentication_fails_because_user_is_banned_returns_status_code_forbidden(): void
+    {
+        Auth::shouldReceive('once')->andReturn(true);
+        $this->repository->method('isBanned')->willReturn(true);
+
+        $data = [
+            AuthControllerInputs::FIELD_EMAIL => 'email@email.com',
+            AuthControllerInputs::FIELD_PASSWORD => 'mypassword'
+        ];
+        $response = $this->postJson('/api/login', $data);
+
+        $response->assertForbidden();
     }
 
     // ---- Validation

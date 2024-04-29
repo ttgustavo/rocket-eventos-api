@@ -22,6 +22,12 @@ class UserRepositoryEloquent implements UserRepository
         return $user->password;
     }
 
+    public function isBanned(string $email): bool
+    {
+        $user = User::whereEmail($email)->first(['status']);
+        return $user->status === UserStatus::Banned->value;
+    }
+
     public function insert(
         string $name,
         string $email,
