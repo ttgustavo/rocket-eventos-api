@@ -2,6 +2,9 @@
 
 namespace App\Domain\Model;
 
+use OpenApi\Attributes\Schema;
+
+#[Schema]
 enum EventStatus : int
 {
     case Draft = 0;

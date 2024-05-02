@@ -3,16 +3,25 @@
 namespace App\Domain\Model;
 
 use Carbon\Carbon;
+use OpenApi\Attributes\Property;
+use OpenApi\Attributes\Schema;
 
-class UserModel
+#[Schema]
+readonly class UserModel
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly string $email,
-        public readonly Carbon $createdAt,
-        public readonly Carbon $updatedAt,
-        public readonly UserStatus $status
+        #[Property(type: 'integer', example: '1000')]
+        public int        $id,
+        #[Property(type: 'string', example: 'John Doe')]
+        public string     $name,
+        #[Property(type: 'string', example: 'email@email.com')]
+        public string     $email,
+        #[Property(type: 'string', format: 'date-time', example: new Carbon)]
+        public Carbon     $createdAt,
+        #[Property(type: 'string', format: 'date-time', example: new Carbon)]
+        public Carbon     $updatedAt,
+        #[Property(type: 'integer', default: UserStatus::Registered)]
+        public UserStatus $status
     ) {
     }
 }

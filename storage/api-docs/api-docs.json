@@ -1,0 +1,372 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Rocket Eventos",
+        "version": "0.1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api"
+        }
+    ],
+    "paths": {
+        "/events/{id}/attendees": {
+            "post": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Subscribe to an event",
+                "description": "Subscribe user to the event with the specified ID in the route.",
+                "operationId": "cc00553d434cb646d85c2189f8fa0a74",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "int"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Already subscribed in the event."
+                    },
+                    "201": {
+                        "description": "Subscribed to the event."
+                    },
+                    "400": {
+                        "description": "Failed to subscribe. There are two reasons to that, specified by the code in body:<br>- 0: validation<br>- 1: event does not exist or subscriptions period has finished",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "description": "Abc",
+                                            "type": "integer",
+                                            "default": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": {
+                    "bearerAuth": {}
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Unsubscribe to an event",
+                "description": "Unsubscribe user from the event with the specified ID in the route.",
+                "operationId": "412447ad13e3e858943c5bf4fed68fe5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "int"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Already unsubscribed to the event."
+                    },
+                    "204": {
+                        "description": "Unsubscribed to the event."
+                    },
+                    "400": {
+                        "description": "Failed to unsubscribe. There are two reasons to that, specified by the code in body:<br>- 0: validation<br>- 1: event does not exist or event is done",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "description": "Abc",
+                                            "type": "integer",
+                                            "default": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": {
+                    "bearerAuth": {}
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "description": "Authenticates the user with e-mail and password specified in the body with JSON format.",
+                "operationId": "db45b1dc6cf8a5d3995d75bb65d84b0f",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authenticated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to authenticate. There are three reasons to that, specified by the code in body:<br>- 0: validation<br>- 1: wrong email/password<br>- 2: account is banned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "description": "Abc",
+                                            "type": "integer",
+                                            "default": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Account banned."
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register user",
+                "description": "Register an user specifying name, e-mail and password and they are required. This route has two return types.",
+                "operationId": "49d5219635f610e10fd5b9774ffe877f",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The user was registered successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to register. There are two reasons to that, specified by the code in body:<br>- 0: validation<br>- 1: email already exists<br>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "default": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/events": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Display a list of current events.",
+                "description": "Get all events that is subscribable.",
+                "operationId": "d75865607a88f3846e2f3dcedb6f1772",
+                "responses": {
+                    "200": {
+                        "description": "A list of events.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EventModel"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": {
+                    "bearerAuth": {}
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "EventModel": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1000"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "My Event"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "my-event"
+                    },
+                    "details": {
+                        "type": "string",
+                        "example": "A long text."
+                    },
+                    "subscriptionStart": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726125Z"
+                    },
+                    "subscriptionEnd": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726145Z"
+                    },
+                    "presentationAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726160Z"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726173Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726186Z"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "default": 1
+                    }
+                },
+                "type": "object"
+            },
+            "EventStatus": {
+                "type": "string",
+                "enum": [
+                    "Draft",
+                    "Created",
+                    "SubscriptionsOpen",
+                    "SubscriptionsEnded",
+                    "Done",
+                    "Canceled"
+                ]
+            },
+            "UserModel": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1000"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "email@email.com"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726965Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-05-02T14:30:33.726982Z"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "default": 0
+                    }
+                },
+                "type": "object"
+            },
+            "UserStatus": {
+                "type": "string",
+                "enum": [
+                    "Registered",
+                    "Banned"
+                ]
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

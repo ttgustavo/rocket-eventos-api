@@ -2,10 +2,11 @@
 
 namespace App\Presenter\Http\Controllers\Api;
 
+use App\Presenter\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-abstract class ApiController
+abstract class ApiController extends Controller
 {
     protected function responseOk(mixed $payload = null): JsonResponse
     {
