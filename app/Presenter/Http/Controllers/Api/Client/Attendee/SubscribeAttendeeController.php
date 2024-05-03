@@ -33,7 +33,11 @@ class SubscribeAttendeeController extends ApiController
         path: '/events/{id}/attendees',
         description: 'Subscribe user to the event with the specified ID in the route.',
         summary: 'Subscribe to an event',
-        security: ['bearerAuth' => null],
+        security: [
+            [
+                'sanctum' => []
+            ]
+        ],
         tags: ['Subscriptions'],
         parameters: [
             new Parameter(name: 'id', in: 'path', required: true, schema: new Schema(type: 'int'))

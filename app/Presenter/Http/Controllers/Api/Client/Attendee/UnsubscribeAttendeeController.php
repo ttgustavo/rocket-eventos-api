@@ -32,7 +32,11 @@ class UnsubscribeAttendeeController extends ApiController
         path: '/events/{id}/attendees',
         description: 'Unsubscribe user from the event with the specified ID in the route.',
         summary: 'Unsubscribe to an event',
-        security: ['bearerAuth' => null],
+        security: [
+            [
+                'sanctum' => []
+            ]
+        ],
         tags: ['Subscriptions'],
         parameters: [
             new Parameter(name: 'id', in: 'path', required: true, schema: new Schema(type: 'int'))
