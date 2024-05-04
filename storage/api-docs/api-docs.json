@@ -24,7 +24,7 @@
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -53,9 +53,11 @@
                         }
                     }
                 },
-                "security": {
-                    "bearerAuth": {}
-                }
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -70,7 +72,7 @@
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -99,9 +101,11 @@
                         }
                     }
                 },
-                "security": {
-                    "bearerAuth": {}
-                }
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/login": {
@@ -297,27 +301,27 @@
                     "subscriptionStart": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.625864Z"
+                        "example": "2024-05-04T00:03:45.678567Z"
                     },
                     "subscriptionEnd": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.625879Z"
+                        "example": "2024-05-04T00:03:45.678581Z"
                     },
                     "presentationAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.625888Z"
+                        "example": "2024-05-04T00:03:45.678592Z"
                     },
                     "createdAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.625897Z"
+                        "example": "2024-05-04T00:03:45.678601Z"
                     },
                     "updatedAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.625906Z"
+                        "example": "2024-05-04T00:03:45.678610Z"
                     },
                     "status": {
                         "type": "integer",
@@ -354,12 +358,12 @@
                     "createdAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.626428Z"
+                        "example": "2024-05-04T00:03:45.679139Z"
                     },
                     "updatedAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-03T23:50:29.626440Z"
+                        "example": "2024-05-04T00:03:45.679151Z"
                     },
                     "status": {
                         "type": "integer",

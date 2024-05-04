@@ -39,7 +39,7 @@ class UnsubscribeAttendeeController extends ApiController
         ],
         tags: ['Subscriptions'],
         parameters: [
-            new Parameter(name: 'id', in: 'path', required: true, schema: new Schema(type: 'int'))
+            new Parameter(name: 'id', in: 'path', required: true, schema: new Schema(type: 'integer'))
         ],
         responses: [
             new Response(response: HttpResponse::HTTP_OK, description: 'Already unsubscribed to the event.'),
