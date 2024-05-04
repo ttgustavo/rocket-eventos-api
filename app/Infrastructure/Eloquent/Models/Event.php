@@ -69,7 +69,7 @@ class Event extends Model
             $this->id,
             $this->name,
             $this->slug,
-            $this->details,
+            $this->details ?? '',
             $this->subscription_date_start,
             $this->subscription_date_end,
             $this->presentation_at,
