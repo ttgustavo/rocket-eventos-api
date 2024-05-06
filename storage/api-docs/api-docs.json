@@ -10,6 +10,353 @@
         }
     ],
     "paths": {
+        "/admin/events": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List events.",
+                "operationId": "4a806a3ff9c15c0ae9b8f9bfae4d59a5",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The event was created and returns all its data.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "When \"code\" is zero, means validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "totalItems": {
+                                            "type": "integer",
+                                            "default": "1"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EventModel"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The admin is not authenticated."
+                    },
+                    "403": {
+                        "description": "The user is not an admin/super."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Creates an event.",
+                "operationId": "5fb64e8b0d0096b434cb2826820373ae",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "slug",
+                                    "details",
+                                    "subscription_date_start",
+                                    "subscription_date_end",
+                                    "presentation_at"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "subscription_date_start": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    },
+                                    "subscription_date_end": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    },
+                                    "presentation_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The event was created and returns all its data.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventModel"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The admin is not authenticated."
+                    },
+                    "403": {
+                        "description": "The user is not an admin/super."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/events/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Deletes an event.",
+                "operationId": "ffeb53815e6ed101fe7cc0bcd7fd8bef",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The id of the event.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The event was deleted."
+                    },
+                    "400": {
+                        "description": "When \"code\" is zero, means validation. When is one, means that the event does not exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "default": "0"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The admin is not authenticated."
+                    },
+                    "403": {
+                        "description": "The user is not an admin/super."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Updates an event.",
+                "operationId": "b1c734bd4f72fa8172746275f464a361",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The id of the event.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "subscription_date_start": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    },
+                                    "subscription_date_end": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    },
+                                    "presentation_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "default": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The event was updated and returns all its data.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "When \"code\" is zero, means validation. When is one, means that the event does not exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "default": "0"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The admin is not authenticated."
+                    },
+                    "403": {
+                        "description": "The user is not an admin/super."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/events/{slug}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Details of the event.",
+                "operationId": "7087984accf1312cf3c0a45572c69c39",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "The slug of the event.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "slug"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The event was created and returns all its data.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventModel"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "When \"code\" is zero, means validation. When is one, means that the event does not exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "default": "0"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "The admin is not authenticated."
+                    },
+                    "403": {
+                        "description": "The user is not an admin/super."
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/events/{id}/attendees": {
             "post": {
                 "tags": [
@@ -301,27 +648,27 @@
                     "subscriptionStart": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.678567Z"
+                        "example": "2024-05-06T20:13:42.529682Z"
                     },
                     "subscriptionEnd": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.678581Z"
+                        "example": "2024-05-06T20:13:42.529697Z"
                     },
                     "presentationAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.678592Z"
+                        "example": "2024-05-06T20:13:42.529706Z"
                     },
                     "createdAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.678601Z"
+                        "example": "2024-05-06T20:13:42.529715Z"
                     },
                     "updatedAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.678610Z"
+                        "example": "2024-05-06T20:13:42.529723Z"
                     },
                     "status": {
                         "type": "integer",
@@ -358,12 +705,12 @@
                     "createdAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.679139Z"
+                        "example": "2024-05-06T20:13:42.530257Z"
                     },
                     "updatedAt": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-05-04T00:03:45.679151Z"
+                        "example": "2024-05-06T20:13:42.530268Z"
                     },
                     "status": {
                         "type": "integer",

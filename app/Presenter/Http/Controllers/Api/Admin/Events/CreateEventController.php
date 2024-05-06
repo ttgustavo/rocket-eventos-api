@@ -2,6 +2,7 @@
 
 namespace App\Presenter\Http\Controllers\Api\Admin\Events;
 
+use App\Domain\Model\EventModel;
 use App\Domain\Repository\EventRepository;
 use App\Presenter\Http\Controllers\Api\ApiController;
 use App\Presenter\Rules\DateTimeAfterNowRule;
@@ -10,6 +11,12 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes\JsonContent;
+use OpenApi\Attributes\Post;
+use OpenApi\Attributes\Property;
+use OpenApi\Attributes\RequestBody;
+use OpenApi\Attributes\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class CreateEventController extends ApiController
 {
@@ -20,6 +27,49 @@ class CreateEventController extends ApiController
         $this->repository = $repository;
     }
 
+    #[Post(
+        path: '/admin/events',
+        summary: 'Creates an event.',
+        security: [[
+            'sanctum' => []
+        ]],
+        requestBody: new RequestBody(
+            content: new JsonContent(
+                required: [
+                    EventControllerInputs::FIELD_NAME,
+                    EventControllerInputs::FIELD_SLUG,
+                    EventControllerInputs::FIELD_DETAILS,
+                    EventControllerInputs::FIELD_SUBSCRIPTION_START_AT,
+                    EventControllerInputs::FIELD_SUBSCRIPTION_END_AT,
+                    EventControllerInputs::FIELD_PRESENTATION_AT,
+                ],
+                properties: [
+                    new Property(property: EventControllerInputs::FIELD_NAME, type: 'string', default: ''),
+                    new Property(property: EventControllerInputs::FIELD_SLUG, type: 'string', default: ''),
+                    new Property(property: EventControllerInputs::FIELD_DETAILS, type: 'string', default: ''),
+                    new Property(property: EventControllerInputs::FIELD_SUBSCRIPTION_START_AT, type: 'string', format: 'date-time', default: ''),
+                    new Property(property: EventControllerInputs::FIELD_SUBSCRIPTION_END_AT, type: 'string', format: 'date-time', default: ''),
+                    new Property(property: EventControllerInputs::FIELD_PRESENTATION_AT, type: 'string', format: 'date-time', default: ''),
+                ]
+            )
+        ),
+        tags: ['Admin'],
+        responses: [
+            new Response(
+                response: HttpResponse::HTTP_CREATED,
+                description: 'The event was created and returns all its data.',
+                content: new JsonContent(ref: EventModel::class)
+            ),
+            new Response(
+                response: HttpResponse::HTTP_UNAUTHORIZED,
+                description: 'The admin is not authenticated.'
+            ),
+            new Response(
+                response: HttpResponse::HTTP_FORBIDDEN,
+                description: 'The user is not an admin/super.'
+            ),
+        ]
+    )]
     public function __invoke(Request $request): JsonResponse
     {
         $jsonString = $request->getContent();
