@@ -4,6 +4,7 @@ use App\Domain\Model\UserPermissions;
 use App\Presenter\Http\Controllers\Api\Admin\Events\CreateEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\DeleteEventController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\GetEventController;
+use App\Presenter\Http\Controllers\Api\Admin\Events\GetEventsAdminController;
 use App\Presenter\Http\Controllers\Api\Admin\Events\UpdateEventController;
 use App\Presenter\Http\Controllers\Api\Client\Attendee\SubscribeAttendeeController;
 use App\Presenter\Http\Controllers\Api\Client\Attendee\UnsubscribeAttendeeController;
@@ -42,6 +43,7 @@ $adminOrSuperAbility = UserPermissions::getStringPermissionForAdminAndSuper();
 
 Route::middleware(['auth:sanctum', "ability:$adminOrSuperAbility"])->prefix('/admin')->group(function() {
     // Events
+    Route::get('/events', GetEventsAdminController::class);
     Route::post('/events', CreateEventController::class);
     Route::patch('/events/{id}', UpdateEventController::class);
     Route::delete('/events/{id}', DeleteEventController::class);

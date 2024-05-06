@@ -20,6 +20,7 @@ interface EventRepository
     ): EventModel;
 
     public function getAll(int $page = 1): ModelPagination;
+    public function list(int $page): ModelPagination;
 
     public function getById(int $id): ?EventModel;
     public function getBySlug(string $slug): ?EventModel;

@@ -90,6 +90,18 @@ class EventRepositoryEloquentTest extends TestCase
         $this->assertSame(8, ($pagination->totalItems));
     }
 
+    public function test_list_pagination(): void
+    {
+        EventFactory::new()->createMany(15);
+
+        $page1 = $this->repository->list(1);
+        $page2 = $this->repository->list(2);
+
+        $this->assertSame(15, $page1->totalItems);
+        $this->assertCount(10, $page1->items);
+        $this->assertCount(5, $page2->items);
+    }
+
     public function test_getBySlug_returnsModelWhenExists(): void
     {
         $this->createEvent(slug: 'my-event');

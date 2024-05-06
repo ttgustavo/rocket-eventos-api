@@ -78,8 +78,8 @@ Para acessar a documentação da API, rode o projeto e acesse a rota `/api/doc`
     - [ ] Listagem de usuários
     - [ ] Atualizar usuário
     - [ ] Banir usuário
-- [ ] Eventos
-    - [ ] Listagem de eventos
+- [x] Eventos
+    - [x] Listagem de eventos
     - [x] Detalhes do evento
     - [x] Atualização de evento
     - [x] Excluir evento

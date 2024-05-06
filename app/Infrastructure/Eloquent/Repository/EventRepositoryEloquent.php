@@ -72,6 +72,37 @@ class EventRepositoryEloquent implements EventRepository
         );
     }
 
+    public function list(int $page): ModelPagination
+    {
+        $events = new Event;
+        $total = $events->count('1');
+
+        $pagination = $events
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate(
+                perPage: 10,
+                columns: [
+                    'id',
+                    'name',
+                    'slug',
+                    'subscription_date_start',
+                    'subscription_date_end',
+                    'presentation_at',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                ],
+                page: $page
+            );
+
+        return new ModelPagination(
+            $pagination->items(),
+            $total,
+            $pagination->nextPageUrl(),
+            $pagination->previousPageUrl()
+        );
+    }
+
     public function getById(int $id): ?EventModel
     {
         $entity = Event::whereId($id)->first();
